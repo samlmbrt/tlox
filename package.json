@@ -1,0 +1,19 @@
+{
+  "name": "tlox",
+  "version": "0.0.0",
+  "description": "Typescript implementation of the Lox programming language",
+  "main": "dist/tlox.js",
+  "author": "Samuel Lambert",
+  "license": "MIT",
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^4.24.0",
+    "@typescript-eslint/parser": "^4.24.0",
+    "eslint": "^7.27.0",
+    "prettier": "^2.3.0",
+    "typescript": "^4.2.4"
+  },
+  "scripts": {
+    "build": "tsc",
+    "format": "prettier --write ."
+  }
+}
