@@ -1,11 +1,13 @@
 {
   "compilerOptions": {
     "lib": ["es2020"],
-    "module": "system",
-    "outFile": "./dist/tlox.js",
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "outDir": "dist",
     "removeComments": true,
     "sourceMap": true,
-    "strict": true
+    "strict": true,
+    "target": "es5"
   },
   "exclude": ["node_modules", "dist"],
   "include": ["src/**/*"]
