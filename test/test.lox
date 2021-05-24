@@ -1,0 +1,5 @@
+fun allo() {
+  var ppp = 012 + 999 // 0;
+  print "hello";
+  var a_AzZz = nil
+}

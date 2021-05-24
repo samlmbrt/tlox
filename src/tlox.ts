@@ -1,21 +1,12 @@
 import { readFileSync } from 'fs';
 import { createInterface } from 'readline';
-import { TokenType, Token } from './token';
+import { Scanner } from './scanner';
 
 enum ErrorCode {
   BAD_USAGE = 1,
   INVALID_FILE,
   INVALID_CODE,
 }
-
-const error = (line: number, message: string) => {
-  report(line, '', message);
-};
-
-const report = (line: number, where: string, message: string) => {
-  console.log(`[line: ${line}] error ${where}: ${message}`);
-  hadError = true;
-};
 
 const runFile = (filePath: string) => {
   try {
@@ -46,7 +37,9 @@ const runPrompt = () => {
 };
 
 const run = (source: string) => {
-  console.log(source.trim().split(/\s+/));
+  const scanner = new Scanner(source);
+  scanner.scanTokens();
+  scanner.dumpState();
 };
 
 // todo: use a better commnand-line parser when necessary
