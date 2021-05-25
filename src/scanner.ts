@@ -155,7 +155,7 @@ export class Scanner {
     }
 
     this.advance();
-    if (this.peek() !== '/') this.consumeLineComment();
+    if (this.peek() !== '/') this.consumeBlockComment();
   }
 
   private consumeNextIf(match: string): boolean {
