@@ -86,7 +86,8 @@ export class Scanner {
         this.consumeString();
         break;
       case '/':
-        if (this.consumeNextIf('/')) this.consumeComment();
+        if (this.consumeNextIf('/')) this.consumeLineComment();
+        else if (this.consumeNextIf('*')) this.consumeBlockComment();
         else this.addToken(TokenType.SLASH);
         break;
       default:
@@ -139,9 +140,22 @@ export class Scanner {
     this.addToken(type);
   }
 
-  private consumeComment(): void {
-    // Comments are ignored
+  private consumeLineComment(): void {
+    // Line comments are ignored by the scanner
     while (!this.isCompleted() && this.peek() !== '\n') this.advance();
+  }
+
+  private consumeBlockComment(): void {
+    // Block comments are ignored by the scanner
+    while (!this.isCompleted() && this.peek() !== '*') this.advance();
+
+    if (this.isCompleted()) {
+      logSyntaxError(this.line, this.column, 'unterminated block comment');
+      return;
+    }
+
+    this.advance();
+    if (this.peek() !== '/') this.consumeLineComment();
   }
 
   private consumeNextIf(match: string): boolean {
