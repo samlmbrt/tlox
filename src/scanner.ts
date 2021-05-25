@@ -6,6 +6,7 @@ export class Scanner {
   private tokenStartIndex = 0;
   private tokenEndIndex = 0;
   private line = 1;
+  private column = 0;
 
   constructor(private source: string) {}
 
@@ -37,6 +38,7 @@ export class Scanner {
         break;
       case '\n':
         this.line++;
+        this.column = 0;
         break;
       case '(':
         this.addToken(TokenType.LEFT_PAREN);
@@ -93,7 +95,7 @@ export class Scanner {
         } else if (this.isAlpha(character)) {
           this.consumeIdentifier();
         } else {
-          logSyntaxError(this.line, '', 'Unexpected character.');
+          logSyntaxError(this.line, this.column, `unexpected character: ${character}`);
         }
     }
   }
@@ -119,7 +121,7 @@ export class Scanner {
     }
 
     if (this.isCompleted()) {
-      logSyntaxError(this.line, '', 'Unterminated string.');
+      logSyntaxError(this.line, this.column, 'unterminated string');
       return;
     }
 
@@ -153,6 +155,7 @@ export class Scanner {
   private advance(): string {
     if (this.isCompleted()) return '\0';
 
+    this.column++;
     return this.source.charAt(this.tokenEndIndex++);
   }
 
