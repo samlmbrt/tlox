@@ -116,7 +116,10 @@ export class Scanner {
 
   private consumeString(): void {
     while (!this.isCompleted() && this.peek() !== '"') {
-      if (this.peek() === '\n') this.line++;
+      if (this.peek() === '\n') {
+        this.line++;
+        this.column = 0;
+      }
 
       this.advance();
     }
@@ -147,15 +150,22 @@ export class Scanner {
 
   private consumeBlockComment(): void {
     // Block comments are ignored by the scanner
-    while (!this.isCompleted() && this.peek() !== '*') this.advance();
+    while (!this.isCompleted()) {
+      if (this.peek(0) === '*' && this.peek(1) === '/') {
+        this.advance();
+        this.advance();
+        return;
+      }
 
-    if (this.isCompleted()) {
-      logSyntaxError(this.line, this.column, 'unterminated block comment');
-      return;
+      if (this.peek() === '\n') {
+        this.line++;
+        this.column = 0;
+      }
+
+      this.advance();
     }
 
-    this.advance();
-    if (this.peek() !== '/') this.consumeBlockComment();
+    logSyntaxError(this.line, this.column, 'unterminated block comment');
   }
 
   private consumeNextIf(match: string): boolean {
@@ -168,15 +178,15 @@ export class Scanner {
 
   private advance(): string {
     if (this.isCompleted()) return '\0';
-
     this.column++;
+
     return this.source.charAt(this.tokenEndIndex++);
   }
 
   private peek(positionsAhead = 0): string {
     if (this.tokenEndIndex + positionsAhead >= this.source.length) return '\0';
 
-    return this.source.charAt(this.tokenEndIndex);
+    return this.source.charAt(this.tokenEndIndex + positionsAhead);
   }
 
   private addToken(tokenType: TokenType, literal: Literal = null): void {
