@@ -7,11 +7,11 @@ interface Visitor<T> {
   visitUnaryExpression(expression: UnaryExpression): T;
 }
 
-abstract class Expression {
+export abstract class Expression {
   abstract accept<T>(visitor: Visitor<T>): T;
 }
 
-class BinaryExpression extends Expression {
+export class BinaryExpression extends Expression {
   constructor(public left: Expression, public operator: Token, public right: Expression) {
     super();
   }
@@ -21,7 +21,7 @@ class BinaryExpression extends Expression {
   }
 }
 
-class GroupingExpression extends Expression {
+export class GroupingExpression extends Expression {
   constructor(public expression: Expression) {
     super();
   }
@@ -31,7 +31,7 @@ class GroupingExpression extends Expression {
   }
 }
 
-class LiteralExpression extends Expression {
+export class LiteralExpression extends Expression {
   constructor(public value: Literal) {
     super();
   }
@@ -41,7 +41,7 @@ class LiteralExpression extends Expression {
   }
 }
 
-class UnaryExpression extends Expression {
+export class UnaryExpression extends Expression {
   constructor(public operator: Token, public expression: UnaryExpression) {
     super();
   }

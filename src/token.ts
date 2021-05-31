@@ -77,6 +77,10 @@ export class Token {
     private line: number
   ) {}
 
+  getType(): TokenType {
+    return this.tokenType;
+  }
+
   toString(): string {
     return `${this.tokenType} ${this.lexeme} ${this.literal} ${this.line}`;
   }
