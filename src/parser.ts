@@ -110,7 +110,7 @@ export class Parser {
     }
 
     // todosam: replace this
-    return this.expression();
+    throw new Error();
   }
 
   private consume(tokenType: TokenType, message: string) {
