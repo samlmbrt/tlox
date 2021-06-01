@@ -8,13 +8,27 @@
 // unary         -> ("!" | "-") unary | primary;
 // primary       -> NUMBER | STRING | "true" | "false" | "nil" | "(" expression ")";
 
-import { BinaryExpression, Expression } from './expression';
+import {
+  BinaryExpression,
+  Expression,
+  GroupingExpression,
+  LiteralExpression,
+  UnaryExpression,
+} from './expression';
 import { Token, TokenType } from './token';
 
-export class Paser {
+export class Parser {
   private currentTokenIndex = 0;
 
   constructor(private tokens: Array<Token>) {}
+
+  public parse(): Expression | null {
+    try {
+      return this.expression();
+    } catch (error: unknown) {
+      return null;
+    }
+  }
 
   private expression(): Expression {
     return this.equality();
@@ -33,8 +47,77 @@ export class Paser {
   }
 
   private comparison(): Expression {
-    // todo
-    return this.equality();
+    let expression = this.term();
+
+    while (
+      this.match(TokenType.GREATER, TokenType.GREATER_EQUAL, TokenType.LESS, TokenType.LESS_EQUAL)
+    ) {
+      const operator = this.previous();
+      const right = this.term();
+      expression = new BinaryExpression(expression, operator, right);
+    }
+
+    return expression;
+  }
+
+  private term(): Expression {
+    let expression = this.factor();
+
+    while (this.match(TokenType.MINUS, TokenType.PLUS)) {
+      const operator = this.previous();
+      const right = this.factor();
+      expression = new BinaryExpression(expression, operator, right);
+    }
+
+    return expression;
+  }
+
+  private factor(): Expression {
+    let expression = this.unary();
+
+    while (this.match(TokenType.SLASH, TokenType.STAR)) {
+      const operator = this.previous();
+      const right = this.unary();
+      expression = new BinaryExpression(expression, operator, right);
+    }
+
+    return expression;
+  }
+
+  private unary(): Expression {
+    if (this.match(TokenType.BANG, TokenType.MINUS)) {
+      const operator = this.previous();
+      const right = this.unary();
+      return new UnaryExpression(operator, right);
+    }
+
+    return this.primary();
+  }
+
+  private primary(): Expression {
+    if (this.match(TokenType.FALSE)) return new LiteralExpression(false);
+    if (this.match(TokenType.TRUE)) return new LiteralExpression(true);
+    if (this.match(TokenType.NIL)) return new LiteralExpression(null);
+
+    if (this.match(TokenType.NUMBER, TokenType.STRING)) {
+      return new LiteralExpression(this.previous().getLiteral());
+    }
+
+    if (this.match(TokenType.LEFT_PAREN)) {
+      const expression = this.expression();
+      this.consume(TokenType.RIGHT_PAREN, "Expect ')' after expression.");
+      return new GroupingExpression(expression);
+    }
+
+    // todosam: replace this
+    return this.expression();
+  }
+
+  private consume(tokenType: TokenType, message: string) {
+    if (this.check(tokenType)) return this.advance();
+
+    // todosam: replace this
+    throw new Error(message);
   }
 
   private match(...types: Array<TokenType>): boolean {

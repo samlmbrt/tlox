@@ -42,7 +42,7 @@ export class LiteralExpression extends Expression {
 }
 
 export class UnaryExpression extends Expression {
-  constructor(public operator: Token, public expression: UnaryExpression) {
+  constructor(public operator: Token, public expression: Expression) {
     super();
   }
 

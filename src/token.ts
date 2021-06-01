@@ -1,4 +1,4 @@
-export type Literal = string | number | null;
+export type Literal = string | number | boolean | null;
 
 export enum TokenType {
   // Single-character tokens
@@ -79,6 +79,10 @@ export class Token {
 
   getType(): TokenType {
     return this.tokenType;
+  }
+
+  getLiteral(): Literal {
+    return this.literal;
   }
 
   toString(): string {

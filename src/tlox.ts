@@ -1,6 +1,7 @@
 import { readFileSync } from 'fs';
 import { createInterface } from 'readline';
 import { Scanner } from './scanner';
+import { Parser } from './parser';
 
 enum ErrorCode {
   BAD_USAGE = 1,
@@ -38,8 +39,9 @@ const runPrompt = () => {
 
 const run = (source: string) => {
   const scanner = new Scanner(source);
-  scanner.scanTokens();
-  scanner.dumpState();
+  const tokens = scanner.scanTokens();
+  const parser = new Parser(tokens);
+  parser.parse();
 };
 
 // todo: use a better commnand-line parser when necessary
