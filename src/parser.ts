@@ -1,14 +1,3 @@
-// Lox grammar
-//
-// expression    -> equality
-// equality      -> comparison (("!= | ==") comparison)*;
-// comparison    -> term ((">" | ">= | "<" | "<="") term)*;
-// term          -> factor (("-" | "+") factor)*;
-// factor        -> unary (("/" | "*") unary)*;
-// unary         -> ("!" | "-") unary | primary;
-// primary       -> NUMBER | STRING | "true" | "false" | "nil" | "(" expression ")";
-
-import { ParseError } from './error';
 import {
   BinaryExpression,
   Expression,
@@ -16,6 +5,7 @@ import {
   LiteralExpression,
   UnaryExpression,
 } from './expression';
+import { ParseError } from './error';
 import { Token, TokenType } from './token';
 
 export class Parser {
@@ -110,15 +100,13 @@ export class Parser {
       return new GroupingExpression(expression);
     }
 
-    // todosam: replace this
-    throw new Error();
+    throw this.logError(this.peek(), 'Expression expected');
   }
 
   private consume(tokenType: TokenType, message: string) {
     if (this.check(tokenType)) return this.advance();
 
-    // todosam: replace this
-    throw new Error(message);
+    throw this.logError(this.peek(), message);
   }
 
   private match(...types: Array<TokenType>): boolean {
@@ -156,13 +144,32 @@ export class Parser {
     return this.peek().getType() == TokenType.EOF;
   }
 
-  private logError(token: Token, message: string): ParseError {
-    if (token.getType() === TokenType.EOF) {
-      console.error(`[line: ${token.getLine()} at end] error: ${message}`);
-    } else {
-      console.error(`[line: ${token.getLine()} at '${token.getLexeme()}'] error: ${message}`);
+  private synchronize(): void {
+    this.advance();
+
+    while (!this.isCompleted()) {
+      const tokenType = this.previous().getType();
+      if (tokenType === TokenType.SEMICOLON) return;
+
+      switch (tokenType) {
+        case TokenType.CLASS:
+        case TokenType.FUN:
+        case TokenType.VAR:
+        case TokenType.FOR:
+        case TokenType.IF:
+        case TokenType.WHILE:
+        case TokenType.PRINT:
+        case TokenType.RETURN:
+          return;
+      }
     }
 
+    this.advance();
+  }
+
+  private logError(token: Token, message: string): ParseError {
+    const location = token.getType() === TokenType.EOF ? 'end' : token.getLexeme();
+    console.error(`(parser)[line: ${token.getLine()} at ${location}] error: ${message}`);
     return new ParseError();
   }
 }

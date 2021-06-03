@@ -221,7 +221,7 @@ export class Scanner {
   }
 
   private logError(line: number, column: number, message: string): ParseError {
-    console.error(`[line: ${line}, column: ${column}] error: ${message}`);
+    console.error(`(scanner)[line: ${line}, column: ${column}] error: ${message}`);
     return new ParseError();
   }
 }
