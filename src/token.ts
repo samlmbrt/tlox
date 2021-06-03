@@ -81,8 +81,16 @@ export class Token {
     return this.tokenType;
   }
 
+  getLexeme(): string {
+    return this.lexeme;
+  }
+
   getLiteral(): Literal {
     return this.literal;
+  }
+
+  getLine(): number {
+    return this.line;
   }
 
   toString(): string {

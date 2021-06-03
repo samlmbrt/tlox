@@ -8,6 +8,7 @@
 // unary         -> ("!" | "-") unary | primary;
 // primary       -> NUMBER | STRING | "true" | "false" | "nil" | "(" expression ")";
 
+import { ParseError } from './error';
 import {
   BinaryExpression,
   Expression,
@@ -153,5 +154,15 @@ export class Parser {
 
   private isCompleted(): boolean {
     return this.peek().getType() == TokenType.EOF;
+  }
+
+  private logError(token: Token, message: string): ParseError {
+    if (token.getType() === TokenType.EOF) {
+      console.error(`[line: ${token.getLine()} at end] error: ${message}`);
+    } else {
+      console.error(`[line: ${token.getLine()} at '${token.getLexeme()}'] error: ${message}`);
+    }
+
+    return new ParseError();
   }
 }

@@ -1,4 +1,4 @@
-import { logSyntaxError } from './error';
+import { ParseError } from './error';
 import { keywords, Literal, Token, TokenType } from './token';
 
 export class Scanner {
@@ -96,7 +96,7 @@ export class Scanner {
         } else if (this.isAlpha(character)) {
           this.consumeIdentifier();
         } else {
-          logSyntaxError(this.line, this.column, `unexpected character: ${character}`);
+          this.logError(this.line, this.column, `unexpected character: ${character}`);
         }
     }
   }
@@ -125,7 +125,7 @@ export class Scanner {
     }
 
     if (this.isCompleted()) {
-      logSyntaxError(this.line, this.column, 'unterminated string');
+      this.logError(this.line, this.column, 'unterminated string');
       return;
     }
 
@@ -165,7 +165,7 @@ export class Scanner {
       this.advance();
     }
 
-    logSyntaxError(this.line, this.column, 'unterminated block comment');
+    this.logError(this.line, this.column, 'unterminated block comment');
   }
 
   private consumeNextIf(match: string): boolean {
@@ -218,5 +218,10 @@ export class Scanner {
 
   private isCompleted(): boolean {
     return this.tokenEndIndex >= this.source.length;
+  }
+
+  private logError(line: number, column: number, message: string): ParseError {
+    console.error(`[line: ${line}, column: ${column}] error: ${message}`);
+    return new ParseError();
   }
 }
