@@ -5,6 +5,7 @@ interface Visitor<T> {
   visitGroupingExpression(expression: GroupingExpression): T;
   visitLiteralExpression(expression: LiteralExpression): T;
   visitUnaryExpression(expression: UnaryExpression): T;
+  visitTernaryExpression(expression: TernaryExpression): T;
 }
 
 export abstract class Expression {
@@ -67,5 +68,21 @@ export class UnaryExpression extends Expression {
 
   accept<T>(visitor: Visitor<T>): T {
     return visitor.visitUnaryExpression(this);
+  }
+}
+
+export class TernaryExpression extends Expression {
+  constructor(public left: Expression, public middle: Expression, public right: Expression) {
+    super();
+
+    // todosam: replace this by better logging mechanism
+    console.log('Creating a termary expression');
+    console.log(left);
+    console.log(middle);
+    console.log(right);
+  }
+
+  accept<T>(visitor: Visitor<T>): T {
+    return visitor.visitTernaryExpression(this);
   }
 }

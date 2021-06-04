@@ -13,6 +13,8 @@ export enum TokenType {
   SEMICOLON,
   SLASH,
   STAR,
+  QUESTION,
+  COLON,
 
   // On or two character tokens
   BANG,

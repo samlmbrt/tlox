@@ -3,6 +3,7 @@ import {
   Expression,
   GroupingExpression,
   LiteralExpression,
+  TernaryExpression,
   UnaryExpression,
 } from './expression';
 import { ParseError } from './error';
@@ -22,7 +23,20 @@ export class Parser {
   }
 
   private expression(): Expression {
-    return this.equality();
+    return this.ternary();
+  }
+
+  private ternary(): Expression {
+    const expression = this.equality();
+
+    if (this.match(TokenType.QUESTION)) {
+      const middle = this.ternary();
+      this.consume(TokenType.COLON, "Expect ':' in ternary operator.");
+      const right = this.ternary();
+      return new TernaryExpression(expression, middle, right);
+    }
+
+    return expression;
   }
 
   private equality(): Expression {
