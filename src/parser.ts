@@ -103,10 +103,12 @@ export class Parser {
   }
 
   private unary(): Expression {
-    if (this.match(TokenType.BANG, TokenType.MINUS)) {
+    if (this.match(TokenType.BANG, TokenType.MINUS, TokenType.PLUS)) {
       const operator = this.previous();
       const right = this.unary();
-      return new UnaryExpression(operator, right);
+
+      if (operator.getType() !== TokenType.PLUS) return new UnaryExpression(operator, right);
+      throw this.logError(this.peek(), 'Unary + is not supported.');
     }
 
     return this.primary();
