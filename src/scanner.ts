@@ -2,6 +2,7 @@ import { ParseError } from './error';
 import { keywords, Literal, Token, TokenType } from './token';
 
 export class Scanner {
+  public hadError = false;
   private tokens: Array<Token> = [];
   private tokenStartIndex = 0;
   private tokenEndIndex = 0;
@@ -228,6 +229,7 @@ export class Scanner {
 
   private logError(line: number, column: number, message: string): ParseError {
     console.error(`(scanner)[line: ${line}, column: ${column}] error: ${message}`);
+    this.hadError = true;
     return new ParseError();
   }
 }

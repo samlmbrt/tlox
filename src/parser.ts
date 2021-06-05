@@ -10,6 +10,7 @@ import { ParseError } from './error';
 import { Token, TokenType } from './token';
 
 export class Parser {
+  public hadError = false;
   private currentTokenIndex = 0;
 
   constructor(private tokens: Array<Token>) {}
@@ -184,6 +185,7 @@ export class Parser {
   private logError(token: Token, message: string): ParseError {
     const location = token.getType() === TokenType.EOF ? 'end' : token.getLexeme();
     console.error(`(parser)[line: ${token.getLine()} at ${location}] error: ${message}`);
+    this.hadError = true;
     return new ParseError();
   }
 }

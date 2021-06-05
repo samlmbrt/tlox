@@ -40,8 +40,11 @@ const runPrompt = () => {
 const run = (source: string) => {
   const scanner = new Scanner(source);
   const tokens = scanner.scanTokens();
+  if (scanner.hadError) return;
+
   const parser = new Parser(tokens);
   parser.parse();
+  if (parser.hadError) return;
 };
 
 // todo: use a better commnand-line parser when necessary
