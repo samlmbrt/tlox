@@ -6,6 +6,7 @@ interface Visitor<T> {
   visitLiteralExpression(expression: LiteralExpression): T;
   visitUnaryExpression(expression: UnaryExpression): T;
   visitTernaryExpression(expression: TernaryExpression): T;
+  visitCommaExpression(expression: CommaExpression): T;
 }
 
 export abstract class Expression {
@@ -84,5 +85,20 @@ export class TernaryExpression extends Expression {
 
   accept<T>(visitor: Visitor<T>): T {
     return visitor.visitTernaryExpression(this);
+  }
+}
+
+export class CommaExpression extends Expression {
+  constructor(public left: Expression, public right: Expression) {
+    super();
+
+    // todosam: replace this by better logging mechanism
+    console.log('Creating a comma expression');
+    console.log(left);
+    console.log(right);
+  }
+
+  accept<T>(visitor: Visitor<T>): T {
+    return visitor.visitCommaExpression(this);
   }
 }

@@ -1,5 +1,6 @@
 import {
   BinaryExpression,
+  CommaExpression,
   Expression,
   GroupingExpression,
   LiteralExpression,
@@ -17,10 +18,21 @@ export class Parser {
 
   public parse(): Expression | null {
     try {
-      return this.expression();
+      return this.comma();
     } catch (error: unknown) {
       return null;
     }
+  }
+
+  private comma(): Expression {
+    let expression = this.expression();
+
+    while (this.match(TokenType.COMMA)) {
+      const right = this.expression();
+      expression = new CommaExpression(expression, right);
+    }
+
+    return expression;
   }
 
   private expression(): Expression {
