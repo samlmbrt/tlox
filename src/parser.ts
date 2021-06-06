@@ -18,6 +18,7 @@ export class Parser {
 
   public parse(): Expression | null {
     try {
+      console.log(this.tokens);
       return this.comma();
     } catch (error: unknown) {
       return null;
@@ -103,12 +104,25 @@ export class Parser {
   }
 
   private unary(): Expression {
-    if (this.match(TokenType.BANG, TokenType.MINUS, TokenType.PLUS)) {
+    if (this.match(TokenType.BANG, TokenType.MINUS)) {
       const operator = this.previous();
       const right = this.unary();
-
-      if (operator.getType() !== TokenType.PLUS) return new UnaryExpression(operator, right);
-      throw this.logError(this.peek(), 'Unary + is not supported.');
+      return new UnaryExpression(operator, right);
+    } else if (
+      this.match(
+        TokenType.PLUS,
+        TokenType.SLASH,
+        TokenType.STAR,
+        TokenType.BANG_EQUAL,
+        TokenType.EQUAL_EQUAL,
+        TokenType.GREATER,
+        TokenType.GREATER_EQUAL,
+        TokenType.LESS,
+        TokenType.LESS_EQUAL
+      )
+    ) {
+      const unsupportedToken = this.previous();
+      throw this.logError(this.peek(), `Unary ${unsupportedToken.getLexeme()} is not supported.`);
     }
 
     return this.primary();
