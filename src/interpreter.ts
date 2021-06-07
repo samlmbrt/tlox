@@ -89,7 +89,9 @@ export class Interpreter implements Visitor<Literal> {
   }
 
   public visitTernaryExpression(expression: TernaryExpression): Literal {
-    throw new Error('Method not implemented.');
+    return this.evaluate(expression.left)
+      ? this.evaluate(expression.middle)
+      : this.evaluate(expression.right);
   }
 
   public visitCommaExpression(expression: CommaExpression): Literal {
