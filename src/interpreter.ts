@@ -1,3 +1,4 @@
+import { RuntimeError } from './error';
 import {
   BinaryExpression,
   CommaExpression,
@@ -8,36 +9,46 @@ import {
   UnaryExpression,
   Visitor,
 } from './expression';
-import { Literal, TokenType } from './token';
+import { Literal, Token, TokenType } from './token';
 
 class Interpreter implements Visitor<Literal> {
   public visitBinaryExpression(expression: BinaryExpression): Literal {
     const left = this.evaluate(expression.left);
     const right = this.evaluate(expression.right);
+    const operator = expression.operator;
 
-    switch (expression.operator.getType()) {
+    switch (operator.getType()) {
       case TokenType.GREATER:
+        this.checkNumberOperand(operator, left, right);
         return (left as boolean) > (right as boolean);
       case TokenType.GREATER_EQUAL:
+        this.checkNumberOperand(operator, left, right);
         return (left as boolean) >= (right as boolean);
       case TokenType.LESS:
+        this.checkNumberOperand(operator, left, right);
         return (left as boolean) < (right as boolean);
       case TokenType.LESS_EQUAL:
+        this.checkNumberOperand(operator, left, right);
         return (left as boolean) <= (right as boolean);
       case TokenType.BANG_EQUAL:
+        this.checkNumberOperand(operator, left, right);
         return left !== right;
       case TokenType.EQUAL_EQUAL:
+        this.checkNumberOperand(operator, left, right);
         return left === right;
       case TokenType.MINUS:
+        this.checkNumberOperand(operator, left, right);
         return (left as number) - (right as number);
       case TokenType.SLASH:
+        this.checkNumberOperand(operator, left, right);
         return (left as number) / (right as number);
       case TokenType.STAR:
+        this.checkNumberOperand(operator, left, right);
         return (left as number) * (right as number);
       case TokenType.PLUS:
         if (typeof left === 'number' && typeof right === 'number') return left + right;
         if (typeof left === 'string' && typeof right === 'string') return left + right;
-        break;
+        throw new RuntimeError(operator, 'Operands must be two numbers or two strings.');
     }
 
     throw 'Unreachable code';
@@ -53,12 +64,13 @@ class Interpreter implements Visitor<Literal> {
 
   public visitUnaryExpression(expression: UnaryExpression): Literal {
     const operand = this.evaluate(expression.expression);
+    const operator = expression.operator;
 
-    switch (expression.operator.getType()) {
+    switch (operator.getType()) {
       case TokenType.BANG:
         return operand !== null && operand !== false;
       case TokenType.MINUS:
-        // todosam: this is possibly null, fix!
+        this.checkNumberOperand(operator, operand);
         return -(operand as number);
     }
 
@@ -81,5 +93,10 @@ class Interpreter implements Visitor<Literal> {
     if (a === null && b === null) return true;
     if (a === null) return false;
     return a === b;
+  }
+
+  private checkNumberOperand(operator: Token, ...operands: Array<Literal>): void {
+    if (operands.every((operand) => typeof operand === 'number')) return;
+    throw new RuntimeError(operator, 'Operands must be numbers.');
   }
 }
