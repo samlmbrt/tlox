@@ -118,7 +118,7 @@ export class Scanner {
     }
 
     const text = this.source.substring(this.tokenStartIndex, this.tokenEndIndex);
-    this.addToken(TokenType.NUMBER, text);
+    this.addToken(TokenType.NUMBER, parseFloat(text));
   }
 
   private consumeString(): void {

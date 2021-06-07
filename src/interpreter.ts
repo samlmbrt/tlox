@@ -11,7 +11,16 @@ import {
 } from './expression';
 import { Literal, Token, TokenType } from './token';
 
-class Interpreter implements Visitor<Literal> {
+export class Interpreter implements Visitor<Literal> {
+  public interpret(expression: Expression): void {
+    try {
+      const value = this.evaluate(expression);
+      console.log(value);
+    } catch (error) {
+      // todosam
+    }
+  }
+
   public visitBinaryExpression(expression: BinaryExpression): Literal {
     const left = this.evaluate(expression.left);
     const right = this.evaluate(expression.right);

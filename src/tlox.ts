@@ -1,7 +1,8 @@
 import { readFileSync } from 'fs';
 import { createInterface } from 'readline';
-import { Scanner } from './scanner';
+import { Interpreter } from './interpreter';
 import { Parser } from './parser';
+import { Scanner } from './scanner';
 
 enum ErrorCode {
   BAD_USAGE = 1,
@@ -15,7 +16,7 @@ const runFile = (filePath: string) => {
     if (hadError) {
       process.exit(ErrorCode.INVALID_CODE);
     }
-  } catch (err) {
+  } catch (error) {
     console.error(`Could not open file: ${filePath}`);
     process.exit(ErrorCode.INVALID_FILE);
   }
@@ -43,8 +44,11 @@ const run = (source: string) => {
   if (scanner.hadError) return;
 
   const parser = new Parser(tokens);
-  parser.parse();
-  if (parser.hadError) return;
+  const expression = parser.parse();
+  if (parser.hadError || !expression) return;
+
+  const interpreter = new Interpreter();
+  interpreter.interpret(expression);
 };
 
 // todo: use a better commnand-line parser when necessary

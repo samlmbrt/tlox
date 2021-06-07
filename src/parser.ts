@@ -18,7 +18,6 @@ export class Parser {
 
   public parse(): Expression | null {
     try {
-      console.log(this.tokens);
       return this.comma();
     } catch (error: unknown) {
       return null;

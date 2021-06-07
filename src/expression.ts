@@ -18,10 +18,10 @@ export class BinaryExpression extends Expression {
     super();
 
     // todosam: replace this by better logging mechanism
-    console.log('Creating a binary expression');
-    console.log(left);
-    console.log(operator);
-    console.log(right);
+    // console.log('Creating a binary expression');
+    // console.log(left);
+    // console.log(operator);
+    // console.log(right);
   }
 
   accept<T>(visitor: Visitor<T>): T {
@@ -34,8 +34,8 @@ export class GroupingExpression extends Expression {
     super();
 
     // todosam: replace this by better logging mechanism
-    console.log('Creating a grouping expression');
-    console.log(expression);
+    // console.log('Creating a grouping expression');
+    // console.log(expression);
   }
 
   accept<T>(visitor: Visitor<T>): T {
@@ -48,8 +48,8 @@ export class LiteralExpression extends Expression {
     super();
 
     // todosam: replace this by better logging mechanism
-    console.log('Creating a literal expression');
-    console.log(value);
+    // console.log('Creating a literal expression');
+    // console.log(value);
   }
 
   accept<T>(visitor: Visitor<T>): T {
@@ -62,9 +62,9 @@ export class UnaryExpression extends Expression {
     super();
 
     // todosam: replace this by better logging mechanism
-    console.log('Creating an unary expression');
-    console.log(operator);
-    console.log(expression);
+    // console.log('Creating an unary expression');
+    // console.log(operator);
+    // console.log(expression);
   }
 
   accept<T>(visitor: Visitor<T>): T {
@@ -77,10 +77,10 @@ export class TernaryExpression extends Expression {
     super();
 
     // todosam: replace this by better logging mechanism
-    console.log('Creating a termary expression');
-    console.log(left);
-    console.log(middle);
-    console.log(right);
+    // console.log('Creating a termary expression');
+    // console.log(left);
+    // console.log(middle);
+    // console.log(right);
   }
 
   accept<T>(visitor: Visitor<T>): T {
@@ -93,9 +93,9 @@ export class CommaExpression extends Expression {
     super();
 
     // todosam: replace this by better logging mechanism
-    console.log('Creating a comma expression');
-    console.log(left);
-    console.log(right);
+    // console.log('Creating a comma expression');
+    // console.log(left);
+    // console.log(right);
   }
 
   accept<T>(visitor: Visitor<T>): T {
