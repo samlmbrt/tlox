@@ -12,12 +12,14 @@ import {
 import { Literal, Token, TokenType } from './token';
 
 export class Interpreter implements Visitor<Literal> {
+  public hadError = false;
+
   public interpret(expression: Expression): void {
     try {
       const value = this.evaluate(expression);
       console.log(value);
     } catch (error) {
-      // todosam
+      console.log(error.message);
     }
   }
 
@@ -57,7 +59,7 @@ export class Interpreter implements Visitor<Literal> {
       case TokenType.PLUS:
         if (typeof left === 'number' && typeof right === 'number') return left + right;
         if (typeof left === 'string' && typeof right === 'string') return left + right;
-        throw new RuntimeError(operator, 'Operands must be two numbers or two strings.');
+        this.logError(operator, 'Operands must be two numbers or two strings.');
     }
 
     throw 'Unreachable code';
@@ -98,14 +100,14 @@ export class Interpreter implements Visitor<Literal> {
     return expression.accept(this);
   }
 
-  private isEqual(a: Literal, b: Literal): boolean {
-    if (a === null && b === null) return true;
-    if (a === null) return false;
-    return a === b;
-  }
-
   private checkNumberOperand(operator: Token, ...operands: Array<Literal>): void {
     if (operands.every((operand) => typeof operand === 'number')) return;
-    throw new RuntimeError(operator, 'Operands must be numbers.');
+    this.logError(operator, 'Operands must be numbers.');
+  }
+
+  private logError(token: Token, message: string): RuntimeError {
+    console.error(`(interpreter)[line: ${token.getLine()}] error: ${message}`);
+    this.hadError = true;
+    throw new RuntimeError();
   }
 }
