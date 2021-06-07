@@ -16,11 +16,13 @@ export class Parser {
 
   constructor(private tokens: Array<Token>) {}
 
-  public parse(): Expression | null {
+  public parse(): Expression {
     try {
       return this.comma();
-    } catch (error: unknown) {
-      return null;
+    } catch (error) {
+      // todosam: in the future, we will synchronize the parser at each
+      // statement, which will prevent us to have to throw here.
+      throw 'Unreachable code';
     }
   }
 
