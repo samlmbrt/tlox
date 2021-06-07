@@ -52,6 +52,7 @@ export class Interpreter implements Visitor<Literal> {
         return (left as number) - (right as number);
       case TokenType.SLASH:
         this.checkNumberOperand(operator, left, right);
+        if (right === 0) this.logError(operator, 'You cannot divide by 0.');
         return (left as number) / (right as number);
       case TokenType.STAR:
         this.checkNumberOperand(operator, left, right);
