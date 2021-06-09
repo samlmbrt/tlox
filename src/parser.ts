@@ -11,7 +11,6 @@ import { ParseError } from './error';
 import { Token, TokenType } from './token';
 
 export class Parser {
-  public hadError = false;
   private currentTokenIndex = 0;
 
   constructor(private tokens: Array<Token>) {}
@@ -30,8 +29,9 @@ export class Parser {
     let expression = this.expression();
 
     while (this.match(TokenType.COMMA)) {
+      const operator = this.previous();
       const right = this.expression();
-      expression = new CommaExpression(expression, right);
+      expression = new CommaExpression(expression, operator, right);
     }
 
     return expression;
@@ -214,7 +214,6 @@ export class Parser {
   private logError(token: Token, message: string): ParseError {
     const location = token.getType() === TokenType.EOF ? 'end' : token.getLexeme();
     console.error(`(parser)[line: ${token.getLine()} at ${location}] error: ${message}`);
-    this.hadError = true;
     return new ParseError();
   }
 }

@@ -23,7 +23,7 @@ const runFile = (filePath: string) => {
       process.exit(ErrorCode.RUNTIME_ERROR);
     }
   } catch (error) {
-    console.error(`Could not open file: ${filePath}`);
+    console.log(error);
     process.exit(ErrorCode.INVALID_FILE);
   }
 };
@@ -56,10 +56,7 @@ const run = (source: string) => {
 
   const parser = new Parser(tokens);
   const expression = parser.parse();
-  if (parser.hadError || !expression) {
-    hadParserError = true;
-    return;
-  }
+  // todosam: parse errors are thrown at the moment, fix this!
 
   const interpreter = new Interpreter();
   interpreter.interpret(expression);

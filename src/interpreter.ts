@@ -96,7 +96,18 @@ export class Interpreter implements Visitor<Literal> {
   }
 
   public visitCommaExpression(expression: CommaExpression): Literal {
-    throw new Error('Method not implemented.');
+    //todo: make this usable by any upcoming expression types
+    if (expression.left instanceof CommaExpression) this.visitCommaExpression(expression.left);
+    if (expression.right instanceof CommaExpression) this.visitCommaExpression(expression.right);
+
+    if (expression.left instanceof LiteralExpression) expression.left.value;
+
+    if (expression.right instanceof LiteralExpression) {
+      expression.right.value;
+      return expression.right.value;
+    }
+
+    throw 'Unreachable code';
   }
 
   private evaluate(expression: Expression): Literal {

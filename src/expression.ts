@@ -89,7 +89,7 @@ export class TernaryExpression extends Expression {
 }
 
 export class CommaExpression extends Expression {
-  constructor(public left: Expression, public right: Expression) {
+  constructor(public left: Expression, public operator: Token, public right: Expression) {
     super();
 
     // todosam: replace this by better logging mechanism
