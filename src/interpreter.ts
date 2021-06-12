@@ -9,15 +9,17 @@ import {
   UnaryExpression,
   Visitor,
 } from './expression';
+import { ExpressionStatement, PrintStatement, Statement } from './statement';
 import { Literal, Token, TokenType } from './token';
 
-export class Interpreter implements Visitor<Literal> {
+export class Interpreter implements Visitor<Literal>, Visitor<void> {
   public hadError = false;
 
-  public interpret(expression: Expression): void {
+  public interpret(statements: Array<Statement>): void {
     try {
-      const value = this.evaluate(expression);
-      console.log(value);
+      statements.forEach((statement) => {
+        this.execute(statement);
+      });
     } catch (error) {
       console.log(error.message);
     }
@@ -99,7 +101,6 @@ export class Interpreter implements Visitor<Literal> {
     //todo: make this usable by any upcoming expression types
     if (expression.left instanceof CommaExpression) this.visitCommaExpression(expression.left);
     if (expression.right instanceof CommaExpression) this.visitCommaExpression(expression.right);
-
     if (expression.left instanceof LiteralExpression) expression.left.value;
 
     if (expression.right instanceof LiteralExpression) {
@@ -110,8 +111,21 @@ export class Interpreter implements Visitor<Literal> {
     throw 'Unreachable code';
   }
 
+  public visitExpressionStatement(statement: ExpressionStatement): void {
+    this.evaluate(statement.expression);
+  }
+
+  public visitPrintStatement(statement: PrintStatement): void {
+    const value = this.evaluate(statement.expression);
+    console.log(value);
+  }
+
   private evaluate(expression: Expression): Literal {
     return expression.accept(this);
+  }
+
+  private execute(statement: Statement) {
+    statement.accept(this);
   }
 
   private checkNumberOperand(operator: Token, ...operands: Array<Literal>): void {

@@ -7,6 +7,7 @@ import {
   TernaryExpression,
   UnaryExpression,
 } from './expression';
+import { Statement, ExpressionStatement, PrintStatement } from './statement';
 import { ParseError } from './error';
 import { Token, TokenType } from './token';
 
@@ -15,14 +16,31 @@ export class Parser {
 
   constructor(private tokens: Array<Token>) {}
 
-  public parse(): Expression {
-    try {
-      return this.comma();
-    } catch (error) {
-      // todosam: in the future, we will synchronize the parser at each
-      // statement, which will prevent us to have to throw here.
-      throw 'Unreachable code';
+  public parse(): Array<Statement> {
+    const statements: Array<Statement> = [];
+
+    while (!this.isCompleted()) {
+      statements.push(this.statement());
     }
+
+    return statements;
+  }
+
+  private statement(): Statement {
+    if (this.match(TokenType.PRINT)) return this.printStatement();
+    return this.expressionStatement();
+  }
+
+  private printStatement(): Statement {
+    const value = this.expression();
+    this.consume(TokenType.SEMICOLON, "Expect ';' after value");
+    return new PrintStatement(value);
+  }
+
+  private expressionStatement(): Statement {
+    const value = this.expression();
+    this.consume(TokenType.SEMICOLON, "Expect ';' after value");
+    return new ExpressionStatement(value);
   }
 
   private comma(): Expression {

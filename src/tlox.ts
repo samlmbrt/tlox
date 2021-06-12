@@ -55,11 +55,11 @@ const run = (source: string) => {
   }
 
   const parser = new Parser(tokens);
-  const expression = parser.parse();
+  const statements = parser.parse();
   // todosam: parse errors are thrown at the moment, fix this!
 
   const interpreter = new Interpreter();
-  interpreter.interpret(expression);
+  interpreter.interpret(statements);
   if (interpreter.hadError) {
     hadRuntimeError = true;
     return;
