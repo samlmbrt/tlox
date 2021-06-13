@@ -48,11 +48,12 @@ const run = (source: string): ErrorCode => {
   const statements = parser.parse();
   if (parser.hadError) return ErrorCode.PARSER_ERROR;
 
-  const astPrinter = new AstPrinter();
-  astPrinter.print(statements);
+  // todosam: command-line argument to dump AST?
+  //const astPrinter = new AstPrinter();
+  //astPrinter.print(statements);
 
-  // const interpreter = new Interpreter();
-  // if (!interpreter.interpret(statements)) return ErrorCode.RUNTIME_ERROR;
+  const interpreter = new Interpreter();
+  if (!interpreter.interpret(statements)) return ErrorCode.RUNTIME_ERROR;
 
   return ErrorCode.NO_ERROR;
 };

@@ -92,18 +92,35 @@ export class AstPrinter implements ExpressionVisitor<Literal>, StatementVisitor<
   }
 
   public visitTernaryExpression(expression: TernaryExpression): Literal {
+    this.printWithIndent('[TernaryExpression]');
+    this.indentLevel++;
+    expression.left.accept(this);
+    expression.middle.accept(this);
+    expression.right.accept(this);
+    this.indentLevel--;
     return null;
   }
 
   public visitCommaExpression(expression: CommaExpression): Literal {
+    this.printWithIndent('[CommaExpression]');
+    this.indentLevel++;
+    expression.left.accept(this);
+    expression.right.accept(this);
+    this.indentLevel--;
     return null;
   }
 
   public visitVariableExpression(expression: VariableExpression): Literal {
+    this.printWithIndent(`[VariableExpression] (${expression.name.lexeme})`);
     return null;
   }
 
   public visitAssignmentExpression(expression: AssignmentExpression): Literal {
+    this.printWithIndent('[AssignmentExpression]');
+    this.indentLevel++;
+    this.printWithIndent(`[Variable] (${expression.name.lexeme})`);
+    expression.value.accept(this);
+    this.indentLevel--;
     return null;
   }
 
