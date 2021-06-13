@@ -1,4 +1,4 @@
-import { Literal, Token, TokenType } from './token';
+import { Literal, Token } from './token';
 
 export interface Visitor<T> {
   visitBinaryExpression(expression: BinaryExpression): T;
