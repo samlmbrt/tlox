@@ -18,7 +18,7 @@ const runFile = (filePath: string) => {
     const result = run(readFileSync(filePath, 'utf8'));
     if (result !== ErrorCode.NO_ERROR) process.exit(result);
   } catch (error) {
-    console.log(error);
+    console.error(error);
     process.exit(ErrorCode.INVALID_FILE);
   }
 };
@@ -48,10 +48,7 @@ const run = (source: string): ErrorCode => {
   // todosam: parse errors are thrown at the moment, fix this!
 
   const interpreter = new Interpreter();
-  interpreter.interpret(statements);
-  if (interpreter.hadError) {
-    return ErrorCode.RUNTIME_ERROR;
-  }
+  if (!interpreter.interpret(statements)) return ErrorCode.RUNTIME_ERROR;
 
   return ErrorCode.NO_ERROR;
 };

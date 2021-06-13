@@ -184,7 +184,7 @@ export class Parser {
       )
     ) {
       const unsupportedToken = this.previous();
-      throw this.logError(this.peek(), `Unary ${unsupportedToken.getLexeme()} is not supported.`);
+      throw this.logError(this.peek(), `Unary ${unsupportedToken.lexeme} is not supported.`);
     }
 
     return this.primary();
@@ -196,7 +196,7 @@ export class Parser {
     if (this.match(TokenType.NIL)) return new LiteralExpression(null);
 
     if (this.match(TokenType.NUMBER, TokenType.STRING)) {
-      return new LiteralExpression(this.previous().getLiteral());
+      return new LiteralExpression(this.previous().literal);
     }
 
     if (this.match(TokenType.IDENTIFIER)) {
@@ -232,7 +232,7 @@ export class Parser {
   private check(type: TokenType): boolean {
     if (this.isCompleted()) return false;
 
-    return this.peek().getType() === type;
+    return this.peek().type === type;
   }
 
   private advance(): Token {
@@ -250,14 +250,14 @@ export class Parser {
   }
 
   private isCompleted(): boolean {
-    return this.peek().getType() == TokenType.EOF;
+    return this.peek().type == TokenType.EOF;
   }
 
   private synchronize(): void {
     this.advance();
 
     while (!this.isCompleted()) {
-      const tokenType = this.previous().getType();
+      const tokenType = this.previous().type;
       if (tokenType === TokenType.SEMICOLON) return;
 
       switch (tokenType) {
@@ -277,8 +277,8 @@ export class Parser {
   }
 
   private logError(token: Token, message: string): ParseError {
-    const location = token.getType() === TokenType.EOF ? 'end' : token.getLexeme();
-    console.error(`(parser)[line: ${token.getLine()} at ${location}] error: ${message}`);
+    const location = token.type === TokenType.EOF ? 'end' : token.lexeme;
+    console.error(`(parser)[line: ${token.line} at ${location}] error: ${message}`);
     return new ParseError();
   }
 }

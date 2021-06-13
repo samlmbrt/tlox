@@ -9,20 +9,20 @@ export class Environment {
   }
 
   assign(token: Token, value: Literal): void {
-    const name = token.getLexeme();
+    const name = token.lexeme;
     if (this.values.has(name)) {
       this.values.set(name, value);
     }
   }
 
   get(token: Token): Literal {
-    const name = token.getLexeme();
+    const name = token.lexeme;
     if (this.values.has(name)) {
       return this.values.get(name);
     }
 
-    // todosam: fix error handling
-    console.error(`(interpreter)[line: ${token.getLine()}] error: Undefined variable '${name}'`);
-    throw new RuntimeError();
+    throw new RuntimeError(
+      `[line: ${token.line}, column: ${token.column}] error: undefined variable '${name}'`
+    );
   }
 }

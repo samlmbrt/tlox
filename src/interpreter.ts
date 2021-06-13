@@ -16,17 +16,19 @@ import { Literal, Token, TokenType } from './token';
 import { Environment } from './environment';
 
 export class Interpreter implements Visitor<Literal>, Visitor<void> {
-  public hadError = false;
   private environment = new Environment();
 
-  public interpret(statements: Array<Statement>): void {
+  public interpret(statements: Array<Statement>): boolean {
     try {
       statements.forEach((statement) => {
         this.execute(statement);
       });
     } catch (error) {
-      console.log(error.message);
+      console.error(error.message);
+      return false;
     }
+
+    return true;
   }
 
   public visitBinaryExpression(expression: BinaryExpression): Literal {
@@ -34,7 +36,7 @@ export class Interpreter implements Visitor<Literal>, Visitor<void> {
     const right = this.evaluate(expression.right);
     const operator = expression.operator;
 
-    switch (operator.getType()) {
+    switch (operator.type) {
       case TokenType.GREATER:
         this.checkNumberOperand(operator, left, right);
         return (left as boolean) > (right as boolean);
@@ -58,7 +60,7 @@ export class Interpreter implements Visitor<Literal>, Visitor<void> {
         return (left as number) - (right as number);
       case TokenType.SLASH:
         this.checkNumberOperand(operator, left, right);
-        if (right === 0) this.logError(operator, 'You cannot divide by 0.');
+        if (right === 0) throw this.logError(operator, 'You cannot divide by 0.');
         return (left as number) / (right as number);
       case TokenType.STAR:
         this.checkNumberOperand(operator, left, right);
@@ -66,7 +68,7 @@ export class Interpreter implements Visitor<Literal>, Visitor<void> {
       case TokenType.PLUS:
         if (typeof left === 'number' && typeof right === 'number') return left + right;
         if (typeof left === 'string' && typeof right === 'string') return left + right;
-        this.logError(operator, 'Operands must be two numbers or two strings.');
+        throw this.logError(operator, 'Operands must be two numbers or two strings.');
     }
 
     throw 'Unreachable code';
@@ -84,7 +86,7 @@ export class Interpreter implements Visitor<Literal>, Visitor<void> {
     const operand = this.evaluate(expression.expression);
     const operator = expression.operator;
 
-    switch (operator.getType()) {
+    switch (operator.type) {
       case TokenType.BANG:
         return operand !== null && operand !== false;
       case TokenType.MINUS:
@@ -92,7 +94,7 @@ export class Interpreter implements Visitor<Literal>, Visitor<void> {
         return -(operand as number);
     }
 
-    throw 'Unreachable code';
+    return null;
   }
 
   public visitTernaryExpression(expression: TernaryExpression): Literal {
@@ -102,7 +104,7 @@ export class Interpreter implements Visitor<Literal>, Visitor<void> {
   }
 
   public visitCommaExpression(expression: CommaExpression): Literal {
-    //todo: make this usable by any upcoming expression types
+    // todosam: make this usable by any upcoming expression types
     if (expression.left instanceof CommaExpression) this.visitCommaExpression(expression.left);
     if (expression.right instanceof CommaExpression) this.visitCommaExpression(expression.right);
     if (expression.left instanceof LiteralExpression) expression.left.value;
@@ -112,7 +114,7 @@ export class Interpreter implements Visitor<Literal>, Visitor<void> {
       return expression.right.value;
     }
 
-    throw 'Unreachable code';
+    return null;
   }
 
   public visitVariableExpression(expression: VariableExpression): Literal {
@@ -140,7 +142,7 @@ export class Interpreter implements Visitor<Literal>, Visitor<void> {
       value = this.evaluate(statement.initializer);
     }
 
-    this.environment.define(statement.name.getLexeme(), value);
+    this.environment.define(statement.name.lexeme, value);
   }
 
   private evaluate(expression: Expression): Literal {
@@ -153,12 +155,12 @@ export class Interpreter implements Visitor<Literal>, Visitor<void> {
 
   private checkNumberOperand(operator: Token, ...operands: Array<Literal>): void {
     if (operands.every((operand) => typeof operand === 'number')) return;
-    this.logError(operator, 'Operands must be numbers.');
+    throw this.logError(operator, 'Operands must be numbers.');
   }
 
   private logError(token: Token, message: string): RuntimeError {
-    console.error(`(interpreter)[line: ${token.getLine()}] error: ${message}`);
-    this.hadError = true;
-    throw new RuntimeError();
+    throw new RuntimeError(
+      `(interpreter)[line: ${token.line}, column: ${token.column}] error: ${message}`
+    );
   }
 }

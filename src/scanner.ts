@@ -17,7 +17,7 @@ export class Scanner {
       this.scanToken();
     }
 
-    this.tokens.push(new Token(TokenType.EOF, '\0', null, this.line));
+    this.tokens.push(new Token(TokenType.EOF, '\0', null, this.line, this.column));
     return this.tokens;
   }
 
@@ -195,7 +195,7 @@ export class Scanner {
 
   private addToken(tokenType: TokenType, literal: Literal = null): void {
     const lexeme = this.source.substring(this.tokenStartIndex, this.tokenEndIndex);
-    this.tokens.push(new Token(tokenType, lexeme, literal, this.line));
+    this.tokens.push(new Token(tokenType, lexeme, literal, this.line, this.column));
   }
 
   private isDigit(character: string): boolean {
@@ -226,6 +226,6 @@ export class Scanner {
 
   private logError(message: string): void {
     this.hadError = true;
-    console.error(`[line: ${this.line}, column: ${this.column}] error: ${message}`);
+    console.error(`(scan error)[line: ${this.line}, column: ${this.column}] error: ${message}`);
   }
 }

@@ -73,29 +73,14 @@ export const keywords = new Map([
 
 export class Token {
   constructor(
-    private tokenType: TokenType,
-    private lexeme: string,
-    private literal: Literal,
-    private line: number
+    public type: TokenType,
+    public lexeme: string,
+    public literal: Literal,
+    public line: number,
+    public column: number
   ) {}
 
-  getType(): TokenType {
-    return this.tokenType;
-  }
-
-  getLexeme(): string {
-    return this.lexeme;
-  }
-
-  getLiteral(): Literal {
-    return this.literal;
-  }
-
-  getLine(): number {
-    return this.line;
-  }
-
   toString(): string {
-    return `${this.tokenType} ${this.lexeme} ${this.literal} ${this.line}`;
+    return `${this.type} ${this.lexeme} ${this.literal} ${this.line} ${this.column}`;
   }
 }
