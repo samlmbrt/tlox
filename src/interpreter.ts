@@ -120,7 +120,7 @@ export class Interpreter implements Visitor<Literal>, Visitor<void> {
   }
 
   public visitAssignmentExpression(expression: AssignmentExpression): Literal {
-    const value = this.evaluate(expression);
+    const value = this.evaluate(expression.value);
     this.environment.assign(expression.name, value);
     return value;
   }
