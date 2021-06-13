@@ -1,8 +1,9 @@
 import { Expression } from './expression';
-
+import { Token } from './token';
 export interface Visitor<T> {
   visitExpressionStatement(expression: ExpressionStatement): T;
   visitPrintStatement(expression: PrintStatement): T;
+  visitVariableStatement(expression: VariableStatement): T;
 }
 
 export abstract class Statement {
@@ -12,10 +13,6 @@ export abstract class Statement {
 export class ExpressionStatement extends Statement {
   constructor(public expression: Expression) {
     super();
-
-    // todosam: replace this by better logging mechanism
-    // console.log('Creating an expression statement');
-    // console.log(expression);
   }
 
   accept<T>(visitor: Visitor<T>): T {
@@ -26,13 +23,19 @@ export class ExpressionStatement extends Statement {
 export class PrintStatement extends Statement {
   constructor(public expression: Expression) {
     super();
-
-    // todosam: replace this by better logging mechanism
-    // console.log('Creating a print statement');
-    // console.log(expression);
   }
 
   accept<T>(visitor: Visitor<T>): T {
     return visitor.visitPrintStatement(this);
+  }
+}
+
+export class VariableStatement extends Statement {
+  constructor(public name: Token, public initializer: Expression | null) {
+    super();
+  }
+
+  accept<T>(visitor: Visitor<T>): T {
+    return visitor.visitVariableStatement(this);
   }
 }

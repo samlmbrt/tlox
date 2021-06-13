@@ -1,4 +1,4 @@
-import { Literal, Token } from './token';
+import { Literal, Token, TokenType } from './token';
 
 export interface Visitor<T> {
   visitBinaryExpression(expression: BinaryExpression): T;
@@ -7,6 +7,7 @@ export interface Visitor<T> {
   visitUnaryExpression(expression: UnaryExpression): T;
   visitTernaryExpression(expression: TernaryExpression): T;
   visitCommaExpression(expression: CommaExpression): T;
+  visitVariableExpression(expression: VariableExpression): T;
 }
 
 export abstract class Expression {
@@ -16,12 +17,6 @@ export abstract class Expression {
 export class BinaryExpression extends Expression {
   constructor(public left: Expression, public operator: Token, public right: Expression) {
     super();
-
-    // todosam: replace this by better logging mechanism
-    // console.log('Creating a binary expression');
-    // console.log(left);
-    // console.log(operator);
-    // console.log(right);
   }
 
   accept<T>(visitor: Visitor<T>): T {
@@ -32,10 +27,6 @@ export class BinaryExpression extends Expression {
 export class GroupingExpression extends Expression {
   constructor(public expression: Expression) {
     super();
-
-    // todosam: replace this by better logging mechanism
-    // console.log('Creating a grouping expression');
-    // console.log(expression);
   }
 
   accept<T>(visitor: Visitor<T>): T {
@@ -46,10 +37,6 @@ export class GroupingExpression extends Expression {
 export class LiteralExpression extends Expression {
   constructor(public value: Literal) {
     super();
-
-    // todosam: replace this by better logging mechanism
-    // console.log('Creating a literal expression');
-    // console.log(value);
   }
 
   accept<T>(visitor: Visitor<T>): T {
@@ -60,11 +47,6 @@ export class LiteralExpression extends Expression {
 export class UnaryExpression extends Expression {
   constructor(public operator: Token, public expression: Expression) {
     super();
-
-    // todosam: replace this by better logging mechanism
-    // console.log('Creating an unary expression');
-    // console.log(operator);
-    // console.log(expression);
   }
 
   accept<T>(visitor: Visitor<T>): T {
@@ -75,12 +57,6 @@ export class UnaryExpression extends Expression {
 export class TernaryExpression extends Expression {
   constructor(public left: Expression, public middle: Expression, public right: Expression) {
     super();
-
-    // todosam: replace this by better logging mechanism
-    // console.log('Creating a termary expression');
-    // console.log(left);
-    // console.log(middle);
-    // console.log(right);
   }
 
   accept<T>(visitor: Visitor<T>): T {
@@ -91,14 +67,19 @@ export class TernaryExpression extends Expression {
 export class CommaExpression extends Expression {
   constructor(public left: Expression, public operator: Token, public right: Expression) {
     super();
-
-    // todosam: replace this by better logging mechanism
-    // console.log('Creating a comma expression');
-    // console.log(left);
-    // console.log(right);
   }
 
   accept<T>(visitor: Visitor<T>): T {
     return visitor.visitCommaExpression(this);
+  }
+}
+
+export class VariableExpression extends Expression {
+  constructor(public name: Token) {
+    super();
+  }
+
+  accept<T>(visitor: Visitor<T>): T {
+    return visitor.visitVariableExpression(this);
   }
 }

@@ -6,8 +6,9 @@ import {
   LiteralExpression,
   TernaryExpression,
   UnaryExpression,
+  VariableExpression,
 } from './expression';
-import { Statement, ExpressionStatement, PrintStatement } from './statement';
+import { Statement, ExpressionStatement, PrintStatement, VariableStatement } from './statement';
 import { ParseError } from './error';
 import { Token, TokenType } from './token';
 
@@ -20,10 +21,32 @@ export class Parser {
     const statements: Array<Statement> = [];
 
     while (!this.isCompleted()) {
-      statements.push(this.statement());
+      statements.push(this.declaration());
     }
 
     return statements;
+  }
+
+  private declaration(): Statement {
+    try {
+      if (this.match(TokenType.VAR)) return this.variableDeclaration();
+      return this.statement();
+    } catch (error) {
+      this.synchronize();
+    }
+
+    // todosam: fix this
+  }
+
+  private variableDeclaration(): Statement {
+    const name = this.consume(TokenType.IDENTIFIER, 'Expect variable name.');
+    let initializer: Expression | null = null;
+    if (this.match(TokenType.EQUAL)) {
+      initializer = this.expression();
+    }
+
+    this.consume(TokenType.SEMICOLON, "Expect ';' after variable declaration");
+    return new VariableStatement(name, initializer);
   }
 
   private statement(): Statement {
@@ -155,6 +178,10 @@ export class Parser {
     if (this.match(TokenType.NUMBER, TokenType.STRING)) {
       return new LiteralExpression(this.previous().getLiteral());
     }
+
+    // if (this.match(TokenType.VAR)) {
+    //   return new VariableExpression(this.previous());
+    // }
 
     if (this.match(TokenType.LEFT_PAREN)) {
       const expression = this.expression();

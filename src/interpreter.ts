@@ -7,9 +7,10 @@ import {
   LiteralExpression,
   TernaryExpression,
   UnaryExpression,
+  VariableExpression,
   Visitor,
 } from './expression';
-import { ExpressionStatement, PrintStatement, Statement } from './statement';
+import { ExpressionStatement, PrintStatement, VariableStatement, Statement } from './statement';
 import { Literal, Token, TokenType } from './token';
 
 export class Interpreter implements Visitor<Literal>, Visitor<void> {
@@ -111,6 +112,11 @@ export class Interpreter implements Visitor<Literal>, Visitor<void> {
     throw 'Unreachable code';
   }
 
+  public visitVariableExpression(expression: VariableExpression): Literal {
+    // todosam
+    throw 'Unreachable code';
+  }
+
   public visitExpressionStatement(statement: ExpressionStatement): void {
     this.evaluate(statement.expression);
   }
@@ -118,6 +124,10 @@ export class Interpreter implements Visitor<Literal>, Visitor<void> {
   public visitPrintStatement(statement: PrintStatement): void {
     const value = this.evaluate(statement.expression);
     console.log(value);
+  }
+
+  public visitVariableStatement(statement: VariableStatement): void {
+    // todosam
   }
 
   private evaluate(expression: Expression): Literal {
