@@ -1,4 +1,5 @@
 import {
+  AssignmentExpression,
   BinaryExpression,
   CommaExpression,
   Expression,
@@ -36,6 +37,7 @@ export class Parser {
     }
 
     // todosam: fix this
+    throw 'Unreachable code';
   }
 
   private variableDeclaration(): Statement {
@@ -61,7 +63,7 @@ export class Parser {
   }
 
   private expressionStatement(): Statement {
-    const value = this.expression();
+    const value = this.comma();
     this.consume(TokenType.SEMICOLON, "Expect ';' after value");
     return new ExpressionStatement(value);
   }
@@ -79,7 +81,25 @@ export class Parser {
   }
 
   private expression(): Expression {
-    return this.ternary();
+    return this.assignment();
+  }
+
+  private assignment(): Expression {
+    const expression = this.ternary();
+
+    if (this.match(TokenType.EQUAL)) {
+      const equals = this.previous();
+      const value = this.assignment();
+
+      if (expression instanceof VariableExpression) {
+        const name = expression.name;
+        return new AssignmentExpression(name, value);
+      }
+
+      // todosam: log error without throwing
+    }
+
+    return expression;
   }
 
   private ternary(): Expression {
@@ -179,9 +199,9 @@ export class Parser {
       return new LiteralExpression(this.previous().getLiteral());
     }
 
-    // if (this.match(TokenType.VAR)) {
-    //   return new VariableExpression(this.previous());
-    // }
+    if (this.match(TokenType.IDENTIFIER)) {
+      return new VariableExpression(this.previous());
+    }
 
     if (this.match(TokenType.LEFT_PAREN)) {
       const expression = this.expression();

@@ -1,5 +1,6 @@
 import { RuntimeError } from './error';
 import {
+  AssignmentExpression,
   BinaryExpression,
   CommaExpression,
   Expression,
@@ -12,9 +13,11 @@ import {
 } from './expression';
 import { ExpressionStatement, PrintStatement, VariableStatement, Statement } from './statement';
 import { Literal, Token, TokenType } from './token';
+import { Environment } from './environment';
 
 export class Interpreter implements Visitor<Literal>, Visitor<void> {
   public hadError = false;
+  private environment = new Environment();
 
   public interpret(statements: Array<Statement>): void {
     try {
@@ -113,8 +116,13 @@ export class Interpreter implements Visitor<Literal>, Visitor<void> {
   }
 
   public visitVariableExpression(expression: VariableExpression): Literal {
-    // todosam
-    throw 'Unreachable code';
+    return this.environment.get(expression.name);
+  }
+
+  public visitAssignmentExpression(expression: AssignmentExpression): Literal {
+    const value = this.evaluate(expression);
+    this.environment.assign(expression.name, value);
+    return value;
   }
 
   public visitExpressionStatement(statement: ExpressionStatement): void {
@@ -127,7 +135,12 @@ export class Interpreter implements Visitor<Literal>, Visitor<void> {
   }
 
   public visitVariableStatement(statement: VariableStatement): void {
-    // todosam
+    let value: Literal = null;
+    if (statement.initializer !== null) {
+      value = this.evaluate(statement.initializer);
+    }
+
+    this.environment.define(statement.name.getLexeme(), value);
   }
 
   private evaluate(expression: Expression): Literal {

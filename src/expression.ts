@@ -8,6 +8,7 @@ export interface Visitor<T> {
   visitTernaryExpression(expression: TernaryExpression): T;
   visitCommaExpression(expression: CommaExpression): T;
   visitVariableExpression(expression: VariableExpression): T;
+  visitAssignmentExpression(expression: AssignmentExpression): T;
 }
 
 export abstract class Expression {
@@ -81,5 +82,15 @@ export class VariableExpression extends Expression {
 
   accept<T>(visitor: Visitor<T>): T {
     return visitor.visitVariableExpression(this);
+  }
+}
+
+export class AssignmentExpression extends Expression {
+  constructor(public name: Token, public value: Expression) {
+    super();
+  }
+
+  accept<T>(visitor: Visitor<T>): T {
+    return visitor.visitAssignmentExpression(this);
   }
 }
