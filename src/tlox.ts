@@ -45,7 +45,7 @@ const run = (source: string): ErrorCode => {
 
   const parser = new Parser(tokens);
   const statements = parser.parse();
-  // todosam: parse errors are thrown at the moment, fix this!
+  if (parser.hadError) return ErrorCode.PARSER_ERROR;
 
   const interpreter = new Interpreter();
   if (!interpreter.interpret(statements)) return ErrorCode.RUNTIME_ERROR;

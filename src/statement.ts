@@ -1,13 +1,24 @@
 import { Expression } from './expression';
 import { Token } from './token';
 export interface Visitor<T> {
-  visitExpressionStatement(expression: ExpressionStatement): T;
-  visitPrintStatement(expression: PrintStatement): T;
-  visitVariableStatement(expression: VariableStatement): T;
+  visitEmptyStatement(statement: EmptyStatement): T;
+  visitExpressionStatement(statement: ExpressionStatement): T;
+  visitPrintStatement(statement: PrintStatement): T;
+  visitVariableStatement(statement: VariableStatement): T;
 }
 
 export abstract class Statement {
   abstract accept<T>(visitor: Visitor<T>): T;
+}
+
+export class EmptyStatement extends Statement {
+  constructor() {
+    super();
+  }
+
+  accept<T>(visitor: Visitor<T>): T {
+    return visitor.visitEmptyStatement(this);
+  }
 }
 
 export class ExpressionStatement extends Statement {

@@ -60,7 +60,7 @@ export class Interpreter implements Visitor<Literal>, Visitor<void> {
         return (left as number) - (right as number);
       case TokenType.SLASH:
         this.checkNumberOperand(operator, left, right);
-        if (right === 0) throw this.logError(operator, 'You cannot divide by 0.');
+        if (right === 0) throw this.logError(operator, 'you cannot divide by 0.');
         return (left as number) / (right as number);
       case TokenType.STAR:
         this.checkNumberOperand(operator, left, right);
@@ -68,7 +68,7 @@ export class Interpreter implements Visitor<Literal>, Visitor<void> {
       case TokenType.PLUS:
         if (typeof left === 'number' && typeof right === 'number') return left + right;
         if (typeof left === 'string' && typeof right === 'string') return left + right;
-        throw this.logError(operator, 'Operands must be two numbers or two strings.');
+        throw this.logError(operator, 'operands must be two numbers or two strings.');
     }
 
     throw 'Unreachable code';
@@ -127,6 +127,10 @@ export class Interpreter implements Visitor<Literal>, Visitor<void> {
     return value;
   }
 
+  public visitEmptyStatement(): void {
+    // noop
+  }
+
   public visitExpressionStatement(statement: ExpressionStatement): void {
     this.evaluate(statement.expression);
   }
@@ -155,12 +159,13 @@ export class Interpreter implements Visitor<Literal>, Visitor<void> {
 
   private checkNumberOperand(operator: Token, ...operands: Array<Literal>): void {
     if (operands.every((operand) => typeof operand === 'number')) return;
-    throw this.logError(operator, 'Operands must be numbers.');
+    throw this.logError(operator, 'operands must be numbers.');
   }
 
   private logError(token: Token, message: string): RuntimeError {
+    const location = token.type === TokenType.EOF ? 'end' : token.lexeme;
     throw new RuntimeError(
-      `(interpreter)[line: ${token.line}, column: ${token.column}] error: ${message}`
+      `[line: ${token.line}, column: ${token.column} at ${location}] error: ${message}`
     );
   }
 }

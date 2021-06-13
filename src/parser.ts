@@ -1,19 +1,26 @@
 import {
+  Expression,
   AssignmentExpression,
   BinaryExpression,
   CommaExpression,
-  Expression,
   GroupingExpression,
   LiteralExpression,
   TernaryExpression,
   UnaryExpression,
   VariableExpression,
 } from './expression';
-import { Statement, ExpressionStatement, PrintStatement, VariableStatement } from './statement';
+import {
+  Statement,
+  EmptyStatement,
+  ExpressionStatement,
+  PrintStatement,
+  VariableStatement,
+} from './statement';
 import { ParseError } from './error';
 import { Token, TokenType } from './token';
 
 export class Parser {
+  public hadError = false;
   private currentTokenIndex = 0;
 
   constructor(private tokens: Array<Token>) {}
@@ -33,11 +40,12 @@ export class Parser {
       if (this.match(TokenType.VAR)) return this.variableDeclaration();
       return this.statement();
     } catch (error) {
+      console.error(error.message);
+      this.hadError = true;
       this.synchronize();
     }
 
-    // todosam: fix this
-    throw 'Unreachable code';
+    return new EmptyStatement();
   }
 
   private variableDeclaration(): Statement {
@@ -96,7 +104,7 @@ export class Parser {
         return new AssignmentExpression(name, value);
       }
 
-      // todosam: log error without throwing
+      console.error(this.logError(equals, 'invalid assignment target').message);
     }
 
     return expression;
@@ -184,7 +192,7 @@ export class Parser {
       )
     ) {
       const unsupportedToken = this.previous();
-      throw this.logError(this.peek(), `Unary ${unsupportedToken.lexeme} is not supported.`);
+      throw this.logError(this.peek(), `unary ${unsupportedToken.lexeme} is not supported.`);
     }
 
     return this.primary();
@@ -209,7 +217,7 @@ export class Parser {
       return new GroupingExpression(expression);
     }
 
-    throw this.logError(this.peek(), 'Expression expected');
+    throw this.logError(this.peek(), 'expression expected');
   }
 
   private consume(tokenType: TokenType, message: string) {
@@ -260,7 +268,7 @@ export class Parser {
       const tokenType = this.previous().type;
       if (tokenType === TokenType.SEMICOLON) return;
 
-      switch (tokenType) {
+      switch (this.peek().type) {
         case TokenType.CLASS:
         case TokenType.FUN:
         case TokenType.VAR:
@@ -271,14 +279,15 @@ export class Parser {
         case TokenType.RETURN:
           return;
       }
-    }
 
-    this.advance();
+      this.advance();
+    }
   }
 
   private logError(token: Token, message: string): ParseError {
     const location = token.type === TokenType.EOF ? 'end' : token.lexeme;
-    console.error(`(parser)[line: ${token.line} at ${location}] error: ${message}`);
-    return new ParseError();
+    return new ParseError(
+      `[line: ${token.line}, column: ${token.column} at ${location}] error: ${message}`
+    );
   }
 }
