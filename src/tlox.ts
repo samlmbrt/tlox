@@ -5,7 +5,8 @@ import { Parser } from './parser';
 import { Scanner } from './scanner';
 
 enum ErrorCode {
-  BAD_USAGE = 1,
+  NO_ERROR,
+  BAD_USAGE,
   INVALID_FILE,
   SCANNER_ERROR,
   PARSER_ERROR,
@@ -14,14 +15,8 @@ enum ErrorCode {
 
 const runFile = (filePath: string) => {
   try {
-    run(readFileSync(filePath, 'utf8'));
-    if (hadScannerError) {
-      process.exit(ErrorCode.SCANNER_ERROR);
-    } else if (hadParserError) {
-      process.exit(ErrorCode.PARSER_ERROR);
-    } else if (hadRuntimeError) {
-      process.exit(ErrorCode.RUNTIME_ERROR);
-    }
+    const result = run(readFileSync(filePath, 'utf8'));
+    if (result !== ErrorCode.NO_ERROR) process.exit(result);
   } catch (error) {
     console.log(error);
     process.exit(ErrorCode.INVALID_FILE);
@@ -36,9 +31,6 @@ const runPrompt = () => {
 
   rl.on('line', (line: string) => {
     run(line);
-    hadScannerError = false;
-    hadParserError = false;
-    hadRuntimeError = false;
     rl.prompt();
   });
 
@@ -46,13 +38,10 @@ const runPrompt = () => {
   rl.prompt();
 };
 
-const run = (source: string) => {
+const run = (source: string): ErrorCode => {
   const scanner = new Scanner(source);
   const tokens = scanner.scanTokens();
-  if (scanner.hadError) {
-    hadScannerError = true;
-    return;
-  }
+  if (scanner.hadError) return ErrorCode.SCANNER_ERROR;
 
   const parser = new Parser(tokens);
   const statements = parser.parse();
@@ -61,16 +50,13 @@ const run = (source: string) => {
   const interpreter = new Interpreter();
   interpreter.interpret(statements);
   if (interpreter.hadError) {
-    hadRuntimeError = true;
-    return;
+    return ErrorCode.RUNTIME_ERROR;
   }
+
+  return ErrorCode.NO_ERROR;
 };
 
-// todo: use a better commnand-line parser when necessary
 const commandLineArguments = process.argv.slice(2);
-let hadScannerError = false;
-let hadParserError = false;
-let hadRuntimeError = false;
 
 if (commandLineArguments.length > 1) {
   console.error('Usage: tlox [file]');

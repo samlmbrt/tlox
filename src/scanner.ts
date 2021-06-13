@@ -1,4 +1,4 @@
-import { ParseError } from './error';
+import {} from './error';
 import { keywords, Literal, Token, TokenType } from './token';
 
 export class Scanner {
@@ -11,7 +11,7 @@ export class Scanner {
 
   constructor(private source: string) {}
 
-  scanTokens(): Array<Token> {
+  public scanTokens(): Array<Token> {
     while (!this.isCompleted()) {
       this.tokenStartIndex = this.tokenEndIndex;
       this.scanToken();
@@ -21,7 +21,7 @@ export class Scanner {
     return this.tokens;
   }
 
-  dumpState(): void {
+  private dumpState(): void {
     console.log(`current token start index: ${this.tokenStartIndex}`);
     console.log(`current token end index: ${this.tokenEndIndex}`);
     console.log(`current line: ${this.line}`);
@@ -98,13 +98,10 @@ export class Scanner {
         else this.addToken(TokenType.SLASH);
         break;
       default:
-        if (this.isDigit(character)) {
-          this.consumeNumber();
-        } else if (this.isAlpha(character)) {
-          this.consumeIdentifier();
-        } else {
-          this.logError(this.line, this.column, `unexpected character: ${character}`);
-        }
+        if (this.isDigit(character)) this.consumeNumber();
+        else if (this.isAlpha(character)) this.consumeIdentifier();
+        else this.logError(`unexpected character: ${character}`);
+        break;
     }
   }
 
@@ -132,7 +129,7 @@ export class Scanner {
     }
 
     if (this.isCompleted()) {
-      this.logError(this.line, this.column, 'unterminated string');
+      this.logError('unterminated string');
       return;
     }
 
@@ -172,7 +169,7 @@ export class Scanner {
       this.advance();
     }
 
-    this.logError(this.line, this.column, 'unterminated block comment');
+    this.logError('unterminated block comment');
   }
 
   private consumeNextIf(match: string): boolean {
@@ -227,9 +224,8 @@ export class Scanner {
     return this.tokenEndIndex >= this.source.length;
   }
 
-  private logError(line: number, column: number, message: string): ParseError {
-    console.error(`(scanner)[line: ${line}, column: ${column}] error: ${message}`);
+  private logError(message: string): void {
     this.hadError = true;
-    return new ParseError();
+    console.error(`[line: ${this.line}, column: ${this.column}] error: ${message}`);
   }
 }
