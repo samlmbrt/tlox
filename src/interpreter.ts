@@ -11,7 +11,13 @@ import {
   VariableExpression,
   Visitor,
 } from './expression';
-import { ExpressionStatement, PrintStatement, VariableStatement, Statement } from './statement';
+import {
+  ExpressionStatement,
+  PrintStatement,
+  VariableStatement,
+  Statement,
+  BlockStatement,
+} from './statement';
 import { Literal, Token, TokenType } from './token';
 import { Environment } from './environment';
 
@@ -131,6 +137,10 @@ export class Interpreter implements Visitor<Literal>, Visitor<void> {
     // noop
   }
 
+  public visitBlockStatement(statement: BlockStatement): void {
+    this.executeBlock(statement.statements, new Environment(this.environment));
+  }
+
   public visitExpressionStatement(statement: ExpressionStatement): void {
     this.evaluate(statement.expression);
   }
@@ -147,6 +157,19 @@ export class Interpreter implements Visitor<Literal>, Visitor<void> {
     }
 
     this.environment.define(statement.name.lexeme, value);
+  }
+
+  private executeBlock(statements: Array<Statement>, environment: Environment): void {
+    const previousEnvironment = this.environment;
+
+    try {
+      this.environment = environment;
+      statements.forEach((statement) => {
+        this.execute(statement);
+      });
+    } finally {
+      this.environment = previousEnvironment;
+    }
   }
 
   private evaluate(expression: Expression): Literal {

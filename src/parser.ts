@@ -15,6 +15,7 @@ import {
   ExpressionStatement,
   PrintStatement,
   VariableStatement,
+  BlockStatement,
 } from './statement';
 import { ParseError } from './error';
 import { Token, TokenType } from './token';
@@ -61,6 +62,7 @@ export class Parser {
 
   private statement(): Statement {
     if (this.match(TokenType.PRINT)) return this.printStatement();
+    if (this.match(TokenType.LEFT_BRACE)) return new BlockStatement(this.blockStatement());
     return this.expressionStatement();
   }
 
@@ -68,6 +70,17 @@ export class Parser {
     const value = this.expression();
     this.consume(TokenType.SEMICOLON, "Expect ';' after value");
     return new PrintStatement(value);
+  }
+
+  private blockStatement(): Array<Statement> {
+    const statements: Array<Statement> = [];
+
+    while (!this.check(TokenType.RIGHT_BRACE) && !this.isCompleted()) {
+      statements.push(this.declaration());
+    }
+
+    this.consume(TokenType.RIGHT_BRACE, "Expect '}' after block");
+    return statements;
   }
 
   private expressionStatement(): Statement {
