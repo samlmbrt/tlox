@@ -1,6 +1,7 @@
 import { readFileSync } from 'fs';
 import { createInterface } from 'readline';
 import { AstPrinter } from './astprinter';
+import { Environment } from './environment';
 import { Interpreter } from './interpreter';
 import { Parser } from './parser';
 import { Scanner } from './scanner';
@@ -30,8 +31,10 @@ const runPrompt = () => {
     output: process.stdout,
   });
 
+  const promptEnvironment = new Environment();
+
   rl.on('line', (line: string) => {
-    run(line);
+    run(line, promptEnvironment);
     rl.prompt();
   });
 
@@ -39,7 +42,7 @@ const runPrompt = () => {
   rl.prompt();
 };
 
-const run = (source: string): ErrorCode => {
+const run = (source: string, environment: Environment | null = null): ErrorCode => {
   const scanner = new Scanner(source);
   const tokens = scanner.scanTokens();
   if (scanner.hadError) return ErrorCode.SCANNER_ERROR;
@@ -52,7 +55,7 @@ const run = (source: string): ErrorCode => {
   // const astPrinter = new AstPrinter();
   // astPrinter.print(statements);
 
-  const interpreter = new Interpreter();
+  const interpreter = environment ? new Interpreter(environment) : new Interpreter();
   if (!interpreter.interpret(statements)) return ErrorCode.RUNTIME_ERROR;
 
   return ErrorCode.NO_ERROR;

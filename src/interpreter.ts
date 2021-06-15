@@ -22,7 +22,7 @@ import { Literal, Token, TokenType } from './token';
 import { Environment } from './environment';
 
 export class Interpreter implements Visitor<Literal>, Visitor<void> {
-  private environment = new Environment();
+  constructor(private environment: Environment = new Environment()) {}
 
   public interpret(statements: Array<Statement>): boolean {
     try {
