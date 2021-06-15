@@ -17,6 +17,7 @@ import {
   PrintStatement,
   VariableStatement,
   Visitor as StatementVisitor,
+  BlockStatement,
 } from './statement';
 
 export class AstPrinter implements ExpressionVisitor<Literal>, StatementVisitor<void> {
@@ -67,6 +68,17 @@ export class AstPrinter implements ExpressionVisitor<Literal>, StatementVisitor<
     expression.expression.accept(this);
     this.indentLevel--;
     return null;
+  }
+
+  public visitBlockStatement(statement: BlockStatement): void {
+    this.printWithIndent('[BlockStatement]');
+    this.indentLevel++;
+
+    statement.statements.forEach((statement) => {
+      statement.accept(this);
+    });
+
+    this.indentLevel--;
   }
 
   public visitExpressionStatement(statement: ExpressionStatement): void {
