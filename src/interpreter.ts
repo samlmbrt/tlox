@@ -22,13 +22,24 @@ import { Literal, Token, TokenType } from './token';
 import { Environment } from './environment';
 
 export class Interpreter implements Visitor<Literal>, Visitor<void> {
-  constructor(private environment: Environment = new Environment()) {}
+  private static environment = new Environment();
 
-  public interpret(statements: Array<Statement>): boolean {
+  public interpretStatements(statements: Array<Statement>): boolean {
     try {
       statements.forEach((statement) => {
         this.execute(statement);
       });
+    } catch (error) {
+      console.error(error.message);
+      return false;
+    }
+
+    return true;
+  }
+
+  public interpretExpression(expression: Expression): boolean {
+    try {
+      console.log(this.evaluate(expression));
     } catch (error) {
       console.error(error.message);
       return false;
@@ -124,12 +135,12 @@ export class Interpreter implements Visitor<Literal>, Visitor<void> {
   }
 
   public visitVariableExpression(expression: VariableExpression): Literal {
-    return this.environment.get(expression.name);
+    return Interpreter.environment.get(expression.name);
   }
 
   public visitAssignmentExpression(expression: AssignmentExpression): Literal {
     const value = this.evaluate(expression.value);
-    this.environment.assign(expression.name, value);
+    Interpreter.environment.assign(expression.name, value);
     return value;
   }
 
@@ -138,7 +149,7 @@ export class Interpreter implements Visitor<Literal>, Visitor<void> {
   }
 
   public visitBlockStatement(statement: BlockStatement): void {
-    this.executeBlock(statement.statements, new Environment(this.environment));
+    this.executeBlock(statement.statements, new Environment(Interpreter.environment));
   }
 
   public visitExpressionStatement(statement: ExpressionStatement): void {
@@ -156,19 +167,19 @@ export class Interpreter implements Visitor<Literal>, Visitor<void> {
       value = this.evaluate(statement.initializer);
     }
 
-    this.environment.define(statement.name.lexeme, value);
+    Interpreter.environment.define(statement.name.lexeme, value);
   }
 
   private executeBlock(statements: Array<Statement>, environment: Environment): void {
-    const previousEnvironment = this.environment;
+    const previousEnvironment = Interpreter.environment;
 
     try {
-      this.environment = environment;
+      Interpreter.environment = environment;
       statements.forEach((statement) => {
         this.execute(statement);
       });
     } finally {
-      this.environment = previousEnvironment;
+      Interpreter.environment = previousEnvironment;
     }
   }
 

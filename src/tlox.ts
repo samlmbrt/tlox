@@ -1,10 +1,11 @@
 import { readFileSync } from 'fs';
 import { createInterface } from 'readline';
 import { AstPrinter } from './astprinter';
-import { Environment } from './environment';
 import { Interpreter } from './interpreter';
 import { Parser } from './parser';
 import { Scanner } from './scanner';
+import { Expression } from './expression';
+import { Statement } from './statement';
 
 enum ErrorCode {
   NO_ERROR,
@@ -31,10 +32,10 @@ const runPrompt = () => {
     output: process.stdout,
   });
 
-  const promptEnvironment = new Environment();
+  replMode = true;
 
   rl.on('line', (line: string) => {
-    run(line, promptEnvironment);
+    run(line);
     rl.prompt();
   });
 
@@ -42,26 +43,43 @@ const runPrompt = () => {
   rl.prompt();
 };
 
-const run = (source: string, environment: Environment | null = null): ErrorCode => {
+const run = (source: string): ErrorCode => {
   const scanner = new Scanner(source);
   const tokens = scanner.scanTokens();
-  if (scanner.hadError) return ErrorCode.SCANNER_ERROR;
+  if (scanner.hasError) return ErrorCode.SCANNER_ERROR;
 
   const parser = new Parser(tokens);
-  const statements = parser.parse();
-  if (parser.hadError) return ErrorCode.PARSER_ERROR;
+
+  let expression = null;
+  let statements = null;
+  const shouldEvaluateExpression = replMode && !scanner.hasStatementTerminator;
+
+  if (shouldEvaluateExpression) {
+    expression = parser.parseExpression();
+  } else {
+    statements = parser.parseStatements();
+  }
+
+  if (parser.hasError) return ErrorCode.PARSER_ERROR;
 
   //todosam: command-line argument to dump AST?
   // const astPrinter = new AstPrinter();
   // astPrinter.print(statements);
 
-  const interpreter = environment ? new Interpreter(environment) : new Interpreter();
-  if (!interpreter.interpret(statements)) return ErrorCode.RUNTIME_ERROR;
+  const interpreter = new Interpreter();
+  let success = true;
+  if (shouldEvaluateExpression) {
+    success = interpreter.interpretExpression(expression as Expression);
+  } else {
+    success = interpreter.interpretStatements(statements as Array<Statement>);
+  }
 
+  if (!success) return ErrorCode.RUNTIME_ERROR;
   return ErrorCode.NO_ERROR;
 };
 
 const commandLineArguments = process.argv.slice(2);
+let replMode = false;
 
 if (commandLineArguments.length > 1) {
   console.error('Usage: tlox [file]');

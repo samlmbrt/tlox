@@ -21,12 +21,12 @@ import { ParseError } from './error';
 import { Token, TokenType } from './token';
 
 export class Parser {
-  public hadError = false;
+  public hasError = false;
   private currentTokenIndex = 0;
 
   constructor(private tokens: Array<Token>) {}
 
-  public parse(): Array<Statement> {
+  public parseStatements(): Array<Statement> {
     const statements: Array<Statement> = [];
 
     while (!this.isCompleted()) {
@@ -36,13 +36,17 @@ export class Parser {
     return statements;
   }
 
+  public parseExpression(): Expression {
+    return this.comma();
+  }
+
   private declaration(): Statement {
     try {
       if (this.match(TokenType.VAR)) return this.variableDeclaration();
       return this.statement();
     } catch (error) {
       console.error(error.message);
-      this.hadError = true;
+      this.hasError = true;
       this.synchronize();
     }
 

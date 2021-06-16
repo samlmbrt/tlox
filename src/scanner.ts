@@ -2,7 +2,8 @@ import {} from './error';
 import { keywords, Literal, Token, TokenType } from './token';
 
 export class Scanner {
-  public hadError = false;
+  public hasError = false;
+  public hasStatementTerminator = false;
   private tokens: Array<Token> = [];
   private tokenStartIndex = 0;
   private tokenEndIndex = 0;
@@ -67,6 +68,7 @@ export class Scanner {
         break;
       case ';':
         this.addToken(TokenType.SEMICOLON);
+        this.hasStatementTerminator = true;
         break;
       case '*':
         this.addToken(TokenType.STAR);
@@ -225,7 +227,7 @@ export class Scanner {
   }
 
   private logError(message: string): void {
-    this.hadError = true;
+    this.hasError = true;
     console.error(`(scan error)[line: ${this.line}, column: ${this.column}] error: ${message}`);
   }
 }
