@@ -6,6 +6,7 @@ export interface Visitor<T> {
   visitPrintStatement(statement: PrintStatement): T;
   visitVariableStatement(statement: VariableStatement): T;
   visitBlockStatement(statement: BlockStatement): T;
+  visitIfStatement(statement: IfStatement): T;
 }
 
 export abstract class Statement {
@@ -59,5 +60,19 @@ export class BlockStatement extends Statement {
 
   accept<T>(visitor: Visitor<T>): T {
     return visitor.visitBlockStatement(this);
+  }
+}
+
+export class IfStatement extends Statement {
+  constructor(
+    public condition: Expression,
+    public ifBlock: Statement,
+    public elseBlock: Statement | null
+  ) {
+    super();
+  }
+
+  accept<T>(visitor: Visitor<T>): T {
+    return visitor.visitIfStatement(this);
   }
 }

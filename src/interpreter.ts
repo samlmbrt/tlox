@@ -17,6 +17,7 @@ import {
   VariableStatement,
   Statement,
   BlockStatement,
+  IfStatement,
 } from './statement';
 import { Literal, Token, TokenType } from './token';
 import { Environment } from './environment';
@@ -154,6 +155,12 @@ export class Interpreter implements Visitor<Literal>, Visitor<void> {
 
   public visitBlockStatement(statement: BlockStatement): void {
     this.executeBlock(statement.statements, new Environment(Interpreter.environment));
+  }
+
+  public visitIfStatement(statement: IfStatement): void {
+    const conditionResult = this.evaluate(statement.condition);
+    if (conditionResult) this.execute(statement.ifBlock);
+    else if (statement.elseBlock) this.execute(statement.elseBlock);
   }
 
   public visitExpressionStatement(statement: ExpressionStatement): void {

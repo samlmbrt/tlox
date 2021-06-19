@@ -18,6 +18,7 @@ import {
   VariableStatement,
   Visitor as StatementVisitor,
   BlockStatement,
+  IfStatement,
 } from './statement';
 
 export class AstPrinter implements ExpressionVisitor<Literal>, StatementVisitor<void> {
@@ -79,6 +80,10 @@ export class AstPrinter implements ExpressionVisitor<Literal>, StatementVisitor<
     });
 
     this.indentLevel--;
+  }
+
+  public visitIfStatement(statement: IfStatement): void {
+    // todosam
   }
 
   public visitExpressionStatement(statement: ExpressionStatement): void {

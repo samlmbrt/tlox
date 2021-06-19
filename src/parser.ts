@@ -16,6 +16,7 @@ import {
   PrintStatement,
   VariableStatement,
   BlockStatement,
+  IfStatement,
 } from './statement';
 import { ParseError } from './error';
 import { Token, TokenType } from './token';
@@ -67,6 +68,7 @@ export class Parser {
   private statement(): Statement {
     if (this.match(TokenType.PRINT)) return this.printStatement();
     if (this.match(TokenType.LEFT_BRACE)) return new BlockStatement(this.blockStatement());
+    if (this.match(TokenType.IF)) return this.ifStatement();
     return this.expressionStatement();
   }
 
@@ -85,6 +87,20 @@ export class Parser {
 
     this.consume(TokenType.RIGHT_BRACE, "Expect '}' after block");
     return statements;
+  }
+
+  private ifStatement(): Statement {
+    this.consume(TokenType.LEFT_PAREN, "Expect '(' before condition");
+    const condition = this.comma();
+    this.consume(TokenType.RIGHT_PAREN, "Expect ')' after condition");
+
+    const ifBlock = this.statement();
+    let elseBlock: Statement | null = null;
+    if (this.match(TokenType.ELSE)) {
+      elseBlock = this.statement();
+    }
+
+    return new IfStatement(condition, ifBlock, elseBlock);
   }
 
   private expressionStatement(): Statement {
