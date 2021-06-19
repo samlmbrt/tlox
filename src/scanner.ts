@@ -195,7 +195,7 @@ export class Scanner {
     return this.source.charAt(this.tokenEndIndex + positionsAhead);
   }
 
-  private addToken(tokenType: TokenType, literal: Literal = null): void {
+  private addToken(tokenType: TokenType, literal: Literal = undefined): void {
     const lexeme = this.source.substring(this.tokenStartIndex, this.tokenEndIndex);
     this.tokens.push(new Token(tokenType, lexeme, literal, this.line, this.column));
   }

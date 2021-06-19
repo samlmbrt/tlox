@@ -1,4 +1,4 @@
-export type Literal = string | number | boolean | null;
+export type Literal = string | number | boolean | null | undefined;
 
 export enum TokenType {
   // Single-character tokens

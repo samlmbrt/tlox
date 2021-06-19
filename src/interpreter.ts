@@ -135,6 +135,10 @@ export class Interpreter implements Visitor<Literal>, Visitor<void> {
   }
 
   public visitVariableExpression(expression: VariableExpression): Literal {
+    const value = Interpreter.environment.get(expression.name);
+    if (value === undefined) {
+      throw this.logError(expression.name, 'cannot evaluate uninitialized variable.');
+    }
     return Interpreter.environment.get(expression.name);
   }
 
@@ -162,8 +166,8 @@ export class Interpreter implements Visitor<Literal>, Visitor<void> {
   }
 
   public visitVariableStatement(statement: VariableStatement): void {
-    let value: Literal = null;
-    if (statement.initializer !== null) {
+    let value: Literal = undefined;
+    if (statement.initializer) {
       value = this.evaluate(statement.initializer);
     }
 
