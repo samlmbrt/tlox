@@ -22,6 +22,7 @@ import {
   WhileStatement,
   BreakStatement,
   ContinueStatement,
+  ForStatement,
 } from './statement';
 import { ParseError } from './error';
 import { Token, TokenType } from './token';
@@ -134,13 +135,11 @@ export class Parser {
   }
 
   private forStatement(): Statement {
-    // todosam: this is buggy when using a break/continue statement. redo!
     this.consume(TokenType.LEFT_PAREN, "Expect '(' before for clauses");
 
     let initializer = null;
-    if (this.match(TokenType.SEMICOLON)) initializer = null;
-    else if (this.match(TokenType.VAR)) initializer = this.variableDeclaration();
-    else initializer = this.expressionStatement();
+    if (this.match(TokenType.VAR)) initializer = this.variableDeclaration();
+    else if (!this.match(TokenType.SEMICOLON)) initializer = this.expressionStatement();
 
     let condition = null;
     if (!this.check(TokenType.SEMICOLON)) condition = this.expression();
@@ -150,15 +149,8 @@ export class Parser {
     if (!this.check(TokenType.RIGHT_PAREN)) increment = this.expression();
     this.consume(TokenType.RIGHT_PAREN, "Expect ')' after for clauses");
 
-    let body = this.statement();
-
-    // Desugaring into a while loop
-    if (increment) body = new BlockStatement([body, new ExpressionStatement(increment)]);
-    if (!condition) condition = new LiteralExpression(true);
-    body = new WhileStatement(condition, body);
-
-    if (initializer) body = new BlockStatement([initializer, body]);
-    return body;
+    const body = this.statement();
+    return new ForStatement(initializer, condition, increment, body);
   }
 
   private expressionStatement(): Statement {

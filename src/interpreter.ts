@@ -21,6 +21,7 @@ import {
   BlockStatement,
   IfStatement,
   WhileStatement,
+  ForStatement,
   BreakStatement,
   ContinueStatement,
 } from './statement';
@@ -182,6 +183,21 @@ export class Interpreter implements Visitor<Literal>, Visitor<void> {
     while (this.evaluate(statement.condition)) {
       try {
         this.execute(statement.block);
+      } catch (tokenType) {
+        if (tokenType === TokenType.BREAK) break;
+        if (tokenType === TokenType.CONTINUE) continue;
+      }
+    }
+  }
+
+  public visitForStatement(statement: ForStatement): void {
+    for (
+      statement.initializer ? this.execute(statement.initializer) : true;
+      statement.condition ? this.evaluate(statement.condition) : true;
+      statement.increment ? this.evaluate(statement.increment) : true
+    ) {
+      try {
+        this.execute(statement.body);
       } catch (tokenType) {
         if (tokenType === TokenType.BREAK) break;
         if (tokenType === TokenType.CONTINUE) continue;

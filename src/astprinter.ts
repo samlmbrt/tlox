@@ -22,6 +22,7 @@ import {
   BlockStatement,
   IfStatement,
   WhileStatement,
+  ForStatement,
   BreakStatement,
   ContinueStatement,
 } from './statement';
@@ -118,6 +119,40 @@ export class AstPrinter implements ExpressionVisitor<Literal>, StatementVisitor<
     this.indentLevel++;
     statement.block.accept(this);
     this.indentLevel--;
+    this.indentLevel--;
+  }
+
+  public visitForStatement(statement: ForStatement): void {
+    this.printWithIndent('[ForStatement]');
+    this.indentLevel++;
+
+    this.printWithIndent('[Initializer]');
+    this.indentLevel++;
+    if (statement.initializer !== null) {
+      statement.initializer.accept(this);
+    } else {
+      this.printWithIndent('[Empty]');
+    }
+    this.indentLevel--;
+
+    this.printWithIndent('[Condition]');
+    this.indentLevel++;
+    if (statement.condition !== null) {
+      statement.condition.accept(this);
+    } else {
+      this.printWithIndent('[Empty]');
+    }
+    this.indentLevel--;
+
+    this.printWithIndent('[Increment]');
+    this.indentLevel++;
+    if (statement.increment !== null) {
+      statement.increment.accept(this);
+    } else {
+      this.printWithIndent('[Empty]');
+    }
+    this.indentLevel--;
+
     this.indentLevel--;
   }
 

@@ -10,6 +10,7 @@ export interface Visitor<T> {
   visitBlockStatement(statement: BlockStatement): T;
   visitIfStatement(statement: IfStatement): T;
   visitWhileStatement(statement: WhileStatement): T;
+  visitForStatement(statement: ForStatement): T;
 }
 
 export abstract class Statement {
@@ -107,5 +108,20 @@ export class WhileStatement extends Statement {
 
   accept<T>(visitor: Visitor<T>): T {
     return visitor.visitWhileStatement(this);
+  }
+}
+
+export class ForStatement extends Statement {
+  constructor(
+    public initializer: Statement | null,
+    public condition: Expression | null,
+    public increment: Expression | null,
+    public body: Statement
+  ) {
+    super();
+  }
+
+  accept<T>(visitor: Visitor<T>): T {
+    return visitor.visitForStatement(this);
   }
 }
