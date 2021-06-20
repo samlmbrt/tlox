@@ -3,6 +3,8 @@ import {
   AssignmentExpression,
   BinaryExpression,
   CommaExpression,
+  LogicalOrExpression,
+  LogicalAndExpression,
   GroupingExpression,
   LiteralExpression,
   TernaryExpression,
@@ -136,6 +138,24 @@ export class AstPrinter implements ExpressionVisitor<Literal>, StatementVisitor<
 
   public visitCommaExpression(expression: CommaExpression): Literal {
     this.printWithIndent('[CommaExpression]');
+    this.indentLevel++;
+    expression.left.accept(this);
+    expression.right.accept(this);
+    this.indentLevel--;
+    return null;
+  }
+
+  public visitLogicalOrExpression(expression: LogicalOrExpression): Literal {
+    this.printWithIndent('[LogicalOrExpression]');
+    this.indentLevel++;
+    expression.left.accept(this);
+    expression.right.accept(this);
+    this.indentLevel--;
+    return null;
+  }
+
+  public visitLogicalAndExpression(expression: LogicalAndExpression): Literal {
+    this.printWithIndent('[LogicalAndExpression]');
     this.indentLevel++;
     expression.left.accept(this);
     expression.right.accept(this);
