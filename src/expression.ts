@@ -9,6 +9,8 @@ export interface Visitor<T> {
   visitCommaExpression(expression: CommaExpression): T;
   visitVariableExpression(expression: VariableExpression): T;
   visitAssignmentExpression(expression: AssignmentExpression): T;
+  visitLogicalOrExpression(expression: LogicalOrExpression): T;
+  visitLogicalAndExpression(expression: LogicalOrExpression): T;
 }
 
 export abstract class Expression {
@@ -92,5 +94,25 @@ export class AssignmentExpression extends Expression {
 
   accept<T>(visitor: Visitor<T>): T {
     return visitor.visitAssignmentExpression(this);
+  }
+}
+
+export class LogicalOrExpression extends Expression {
+  constructor(public left: Expression, public right: Expression) {
+    super();
+  }
+
+  accept<T>(visitor: Visitor<T>): T {
+    return visitor.visitLogicalOrExpression(this);
+  }
+}
+
+export class LogicalAndExpression extends Expression {
+  constructor(public left: Expression, public right: Expression) {
+    super();
+  }
+
+  accept<T>(visitor: Visitor<T>): T {
+    return visitor.visitLogicalAndExpression(this);
   }
 }

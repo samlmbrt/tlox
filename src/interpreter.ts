@@ -6,6 +6,8 @@ import {
   Expression,
   GroupingExpression,
   LiteralExpression,
+  LogicalOrExpression,
+  LogicalAndExpression,
   TernaryExpression,
   UnaryExpression,
   VariableExpression,
@@ -133,6 +135,16 @@ export class Interpreter implements Visitor<Literal>, Visitor<void> {
     }
 
     return null;
+  }
+
+  public visitLogicalOrExpression(expression: LogicalOrExpression): Literal {
+    const left = this.evaluate(expression.left);
+    return left ? left : this.evaluate(expression.right);
+  }
+
+  public visitLogicalAndExpression(expression: LogicalAndExpression): Literal {
+    const left = this.evaluate(expression.left);
+    return left ? this.evaluate(expression.right) : left;
   }
 
   public visitVariableExpression(expression: VariableExpression): Literal {

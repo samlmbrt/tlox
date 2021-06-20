@@ -8,6 +8,8 @@ import {
   TernaryExpression,
   UnaryExpression,
   VariableExpression,
+  LogicalOrExpression,
+  LogicalAndExpression,
 } from './expression';
 import {
   Statement,
@@ -144,13 +146,35 @@ export class Parser {
   }
 
   private ternary(): Expression {
-    const expression = this.equality();
+    const expression = this.logicalOr();
 
     if (this.match(TokenType.QUESTION)) {
       const middle = this.ternary();
       this.consume(TokenType.COLON, "Expect ':' in ternary operator.");
       const right = this.ternary();
       return new TernaryExpression(expression, middle, right);
+    }
+
+    return expression;
+  }
+
+  private logicalOr(): Expression {
+    let expression = this.logicalAnd();
+
+    while (this.match(TokenType.OR)) {
+      const right = this.logicalAnd();
+      expression = new LogicalOrExpression(expression, right);
+    }
+
+    return expression;
+  }
+
+  private logicalAnd(): Expression {
+    let expression = this.equality();
+
+    while (this.match(TokenType.AND)) {
+      const right = this.equality();
+      expression = new LogicalAndExpression(expression, right);
     }
 
     return expression;
