@@ -20,6 +20,7 @@ import {
   Statement,
   BlockStatement,
   IfStatement,
+  WhileStatement,
 } from './statement';
 import { Literal, Token, TokenType } from './token';
 import { Environment } from './environment';
@@ -173,6 +174,12 @@ export class Interpreter implements Visitor<Literal>, Visitor<void> {
     const conditionResult = this.evaluate(statement.condition);
     if (conditionResult) this.execute(statement.ifBlock);
     else if (statement.elseBlock) this.execute(statement.elseBlock);
+  }
+
+  public visitWhileStatement(statement: WhileStatement): void {
+    while (this.evaluate(statement.condition)) {
+      this.execute(statement.block);
+    }
   }
 
   public visitExpressionStatement(statement: ExpressionStatement): void {

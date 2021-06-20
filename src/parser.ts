@@ -19,6 +19,7 @@ import {
   VariableStatement,
   BlockStatement,
   IfStatement,
+  WhileStatement,
 } from './statement';
 import { ParseError } from './error';
 import { Token, TokenType } from './token';
@@ -71,6 +72,7 @@ export class Parser {
     if (this.match(TokenType.PRINT)) return this.printStatement();
     if (this.match(TokenType.LEFT_BRACE)) return new BlockStatement(this.blockStatement());
     if (this.match(TokenType.IF)) return this.ifStatement();
+    if (this.match(TokenType.WHILE)) return this.whileStatement();
     return this.expressionStatement();
   }
 
@@ -103,6 +105,15 @@ export class Parser {
     }
 
     return new IfStatement(condition, ifBlock, elseBlock);
+  }
+
+  private whileStatement(): Statement {
+    this.consume(TokenType.LEFT_PAREN, "Expect '(' before condition");
+    const condition = this.comma();
+    this.consume(TokenType.RIGHT_PAREN, "Expect ')' after condition");
+    const block = this.statement();
+
+    return new WhileStatement(condition, block);
   }
 
   private expressionStatement(): Statement {

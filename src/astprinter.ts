@@ -21,6 +21,7 @@ import {
   Visitor as StatementVisitor,
   BlockStatement,
   IfStatement,
+  WhileStatement,
 } from './statement';
 
 export class AstPrinter implements ExpressionVisitor<Literal>, StatementVisitor<void> {
@@ -101,6 +102,20 @@ export class AstPrinter implements ExpressionVisitor<Literal>, StatementVisitor<
       statement.elseBlock.accept(this);
       this.indentLevel--;
     }
+    this.indentLevel--;
+  }
+
+  public visitWhileStatement(statement: WhileStatement): void {
+    this.printWithIndent('[WhileStatement]');
+    this.indentLevel++;
+    this.printWithIndent('[Condition]');
+    this.indentLevel++;
+    statement.condition.accept(this);
+    this.indentLevel--;
+    this.printWithIndent('[Block]');
+    this.indentLevel++;
+    statement.block.accept(this);
+    this.indentLevel--;
     this.indentLevel--;
   }
 
