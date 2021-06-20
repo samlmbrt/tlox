@@ -1,7 +1,7 @@
 var a = true;
+1 + 2;
 
-if (a) {
-  print 1;
-} else {
+if (true) print 1;
+else {
   print 2;
 }

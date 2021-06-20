@@ -83,7 +83,23 @@ export class AstPrinter implements ExpressionVisitor<Literal>, StatementVisitor<
   }
 
   public visitIfStatement(statement: IfStatement): void {
-    // todosam
+    this.printWithIndent('[IfStatement]');
+    this.indentLevel++;
+    this.printWithIndent('[Condition]');
+    this.indentLevel++;
+    statement.condition.accept(this);
+    this.indentLevel--;
+    this.printWithIndent('[IfBlock]');
+    this.indentLevel++;
+    statement.ifBlock.accept(this);
+    this.indentLevel--;
+    if (statement.elseBlock) {
+      this.printWithIndent('[ElseBlock]');
+      this.indentLevel++;
+      statement.elseBlock.accept(this);
+      this.indentLevel--;
+    }
+    this.indentLevel--;
   }
 
   public visitExpressionStatement(statement: ExpressionStatement): void {

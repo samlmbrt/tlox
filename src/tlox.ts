@@ -63,8 +63,10 @@ const run = (source: string): ErrorCode => {
   if (parser.hasError) return ErrorCode.PARSER_ERROR;
 
   //todosam: command-line argument to dump AST?
-  // const astPrinter = new AstPrinter();
-  // astPrinter.print(statements);
+  if (!shouldEvaluateExpression) {
+    // const astPrinter = new AstPrinter();
+    // astPrinter.print(statements as Array<Statement>);
+  }
 
   const interpreter = new Interpreter();
   let success = true;
