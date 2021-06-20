@@ -21,6 +21,8 @@ import {
   BlockStatement,
   IfStatement,
   WhileStatement,
+  BreakStatement,
+  ContinueStatement,
 } from './statement';
 import { Literal, Token, TokenType } from './token';
 import { Environment } from './environment';
@@ -178,7 +180,12 @@ export class Interpreter implements Visitor<Literal>, Visitor<void> {
 
   public visitWhileStatement(statement: WhileStatement): void {
     while (this.evaluate(statement.condition)) {
-      this.execute(statement.block);
+      try {
+        this.execute(statement.block);
+      } catch (tokenType) {
+        if (tokenType === TokenType.BREAK) break;
+        if (tokenType === TokenType.CONTINUE) continue;
+      }
     }
   }
 
@@ -189,6 +196,16 @@ export class Interpreter implements Visitor<Literal>, Visitor<void> {
   public visitPrintStatement(statement: PrintStatement): void {
     const value = this.evaluate(statement.expression);
     console.log(value);
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  public visitBreakStatement(statement: BreakStatement): void {
+    throw TokenType.BREAK;
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  public visitContinueStatement(statement: ContinueStatement): void {
+    throw TokenType.CONTINUE;
   }
 
   public visitVariableStatement(statement: VariableStatement): void {

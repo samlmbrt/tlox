@@ -4,6 +4,8 @@ export interface Visitor<T> {
   visitEmptyStatement(statement: EmptyStatement): T;
   visitExpressionStatement(statement: ExpressionStatement): T;
   visitPrintStatement(statement: PrintStatement): T;
+  visitBreakStatement(statement: BreakStatement): T;
+  visitContinueStatement(statement: ContinueStatement): T;
   visitVariableStatement(statement: VariableStatement): T;
   visitBlockStatement(statement: BlockStatement): T;
   visitIfStatement(statement: IfStatement): T;
@@ -41,6 +43,26 @@ export class PrintStatement extends Statement {
 
   accept<T>(visitor: Visitor<T>): T {
     return visitor.visitPrintStatement(this);
+  }
+}
+
+export class BreakStatement extends Statement {
+  constructor() {
+    super();
+  }
+
+  accept<T>(visitor: Visitor<T>): T {
+    return visitor.visitBreakStatement(this);
+  }
+}
+
+export class ContinueStatement extends Statement {
+  constructor() {
+    super();
+  }
+
+  accept<T>(visitor: Visitor<T>): T {
+    return visitor.visitContinueStatement(this);
   }
 }
 

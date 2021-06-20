@@ -48,6 +48,8 @@ export enum TokenType {
   TRUE,
   VAR,
   WHILE,
+  BREAK,
+  CONTINUE,
 
   EOF,
 }
@@ -69,6 +71,8 @@ export const keywords = new Map([
   ['true', TokenType.TRUE],
   ['var', TokenType.VAR],
   ['while', TokenType.WHILE],
+  ['break', TokenType.BREAK],
+  ['continue', TokenType.CONTINUE],
 ]);
 
 export class Token {

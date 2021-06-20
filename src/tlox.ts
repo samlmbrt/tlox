@@ -64,8 +64,8 @@ const run = (source: string): ErrorCode => {
 
   //todosam: command-line argument to dump AST?
   if (!shouldEvaluateExpression) {
-    const astPrinter = new AstPrinter();
-    astPrinter.print(statements as Array<Statement>);
+    // const astPrinter = new AstPrinter();
+    // astPrinter.print(statements as Array<Statement>);
   }
 
   const interpreter = new Interpreter();

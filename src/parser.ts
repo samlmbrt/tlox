@@ -20,6 +20,8 @@ import {
   BlockStatement,
   IfStatement,
   WhileStatement,
+  BreakStatement,
+  ContinueStatement,
 } from './statement';
 import { ParseError } from './error';
 import { Token, TokenType } from './token';
@@ -74,6 +76,8 @@ export class Parser {
     if (this.match(TokenType.IF)) return this.ifStatement();
     if (this.match(TokenType.WHILE)) return this.whileStatement();
     if (this.match(TokenType.FOR)) return this.forStatement();
+    if (this.match(TokenType.BREAK)) return this.breakStatement();
+    if (this.match(TokenType.CONTINUE)) return this.continueStatement();
     return this.expressionStatement();
   }
 
@@ -81,6 +85,18 @@ export class Parser {
     const value = this.expression();
     this.consume(TokenType.SEMICOLON, "Expect ';' after value");
     return new PrintStatement(value);
+  }
+
+  private breakStatement(): Statement {
+    // todosam: scope to loops only in a semantic analysis step
+    this.consume(TokenType.SEMICOLON, "Expect ';' after value");
+    return new BreakStatement();
+  }
+
+  private continueStatement(): Statement {
+    // todosam: scope to loops only in a semantic analysis step
+    this.consume(TokenType.SEMICOLON, "Expect ';' after value");
+    return new ContinueStatement();
   }
 
   private blockStatement(): Array<Statement> {
@@ -118,6 +134,7 @@ export class Parser {
   }
 
   private forStatement(): Statement {
+    // todosam: this is buggy when using a break/continue statement. redo!
     this.consume(TokenType.LEFT_PAREN, "Expect '(' before for clauses");
 
     let initializer = null;

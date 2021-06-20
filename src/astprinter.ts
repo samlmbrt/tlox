@@ -22,6 +22,8 @@ import {
   BlockStatement,
   IfStatement,
   WhileStatement,
+  BreakStatement,
+  ContinueStatement,
 } from './statement';
 
 export class AstPrinter implements ExpressionVisitor<Literal>, StatementVisitor<void> {
@@ -131,6 +133,16 @@ export class AstPrinter implements ExpressionVisitor<Literal>, StatementVisitor<
     this.indentLevel++;
     statement.expression.accept(this);
     this.indentLevel--;
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  public visitBreakStatement(statement: BreakStatement): void {
+    this.printWithIndent('[BreakStatement]');
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  public visitContinueStatement(statement: ContinueStatement): void {
+    this.printWithIndent('[ContinueStatement]');
   }
 
   public visitVariableStatement(statement: VariableStatement): void {
