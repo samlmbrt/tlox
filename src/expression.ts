@@ -5,6 +5,7 @@ export interface Visitor<T> {
   visitGroupingExpression(expression: GroupingExpression): T;
   visitLiteralExpression(expression: LiteralExpression): T;
   visitUnaryExpression(expression: UnaryExpression): T;
+  visitCrementExpression(expression: CrementExpression): T;
   visitTernaryExpression(expression: TernaryExpression): T;
   visitCommaExpression(expression: CommaExpression): T;
   visitVariableExpression(expression: VariableExpression): T;
@@ -54,6 +55,16 @@ export class UnaryExpression extends Expression {
 
   accept<T>(visitor: Visitor<T>): T {
     return visitor.visitUnaryExpression(this);
+  }
+}
+
+export class CrementExpression extends Expression {
+  constructor(public operator: Token, public expression: Expression) {
+    super();
+  }
+
+  accept<T>(visitor: Visitor<T>): T {
+    return visitor.visitCrementExpression(this);
   }
 }
 

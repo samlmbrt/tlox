@@ -61,10 +61,10 @@ export class Scanner {
         this.addToken(TokenType.DOT);
         break;
       case '-':
-        this.addToken(TokenType.MINUS);
+        this.addToken(this.consumeNextIf('-') ? TokenType.MINUSMINUS : TokenType.MINUS);
         break;
       case '+':
-        this.addToken(TokenType.PLUS);
+        this.addToken(this.consumeNextIf('+') ? TokenType.PLUSPLUS : TokenType.PLUS);
         break;
       case ';':
         this.addToken(TokenType.SEMICOLON);

@@ -12,6 +12,7 @@ import {
   UnaryExpression,
   VariableExpression,
   Visitor,
+  CrementExpression,
 } from './expression';
 import {
   ExpressionStatement,
@@ -116,6 +117,40 @@ export class Interpreter implements Visitor<Literal>, Visitor<void> {
       case TokenType.MINUS:
         this.checkNumberOperand(operator, operand);
         return -(operand as number);
+    }
+
+    return null;
+  }
+
+  public visitCrementExpression(expression: CrementExpression): Literal {
+    const target = expression.expression;
+    const operator = expression.operator;
+    let operand = null;
+
+    if (target instanceof VariableExpression) {
+      operand = Interpreter.environment.get(target.name);
+      this.checkNumberOperand(operator, operand);
+      operand = operand as number;
+
+      switch (operator.type) {
+        case TokenType.PLUSPLUS:
+          Interpreter.environment.assign(target.name, ++operand);
+          return operand;
+        case TokenType.MINUSMINUS:
+          Interpreter.environment.assign(target.name, --operand);
+          return operand;
+      }
+    } else {
+      operand = this.evaluate(target);
+      this.checkNumberOperand(operator, operand);
+      operand = operand as number;
+
+      switch (operator.type) {
+        case TokenType.PLUSPLUS:
+          return ++operand;
+        case TokenType.MINUSMINUS:
+          return --operand;
+      }
     }
 
     return null;

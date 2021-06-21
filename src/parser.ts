@@ -7,6 +7,7 @@ import {
   LiteralExpression,
   TernaryExpression,
   UnaryExpression,
+  CrementExpression,
   VariableExpression,
   LogicalOrExpression,
   LogicalAndExpression,
@@ -283,6 +284,10 @@ export class Parser {
       const operator = this.previous();
       const right = this.unary();
       return new UnaryExpression(operator, right);
+    } else if (this.match(TokenType.PLUSPLUS, TokenType.MINUSMINUS)) {
+      const operator = this.previous();
+      const right = this.unary();
+      return new CrementExpression(operator, right);
     } else if (
       this.match(
         TokenType.PLUS,
