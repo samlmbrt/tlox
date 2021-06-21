@@ -1,4 +1,4 @@
-import { Literal } from './token';
+import { Literal, Token, TokenType } from './token';
 import {
   AssignmentExpression,
   BinaryExpression,
@@ -9,6 +9,7 @@ import {
   LiteralExpression,
   TernaryExpression,
   UnaryExpression,
+  CrementExpression,
   VariableExpression,
   Visitor as ExpressionVisitor,
 } from './expression';
@@ -73,6 +74,24 @@ export class AstPrinter implements ExpressionVisitor<Literal>, StatementVisitor<
     this.indentLevel++;
     this.printWithIndent(`[Operator] (${expression.operator.lexeme})`);
     expression.expression.accept(this);
+    this.indentLevel--;
+    return null;
+  }
+
+  public visitCrementExpression(expression: CrementExpression): Literal {
+    this.printWithIndent('[CrementExpression]');
+    this.indentLevel++;
+
+    if (expression.operator.type === TokenType.PLUSPLUS) {
+      this.printWithIndent('[IncrementExpression]');
+    } else {
+      this.printWithIndent('[DecrementExpression]');
+    }
+
+    this.indentLevel++;
+    expression.expression.accept(this);
+    this.indentLevel--;
+
     this.indentLevel--;
     return null;
   }

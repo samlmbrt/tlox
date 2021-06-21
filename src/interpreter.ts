@@ -123,6 +123,7 @@ export class Interpreter implements Visitor<Literal>, Visitor<void> {
   }
 
   public visitCrementExpression(expression: CrementExpression): Literal {
+    // todosam: simplify
     const target = expression.expression;
     const operator = expression.operator;
     let operand = null;
