@@ -11,6 +11,7 @@ export interface Visitor<T> {
   visitIfStatement(statement: IfStatement): T;
   visitWhileStatement(statement: WhileStatement): T;
   visitForStatement(statement: ForStatement): T;
+  visitFunctionStatement(statement: FunctionStatement): T;
 }
 
 export abstract class Statement {
@@ -123,5 +124,15 @@ export class ForStatement extends Statement {
 
   accept<T>(visitor: Visitor<T>): T {
     return visitor.visitForStatement(this);
+  }
+}
+
+export class FunctionStatement extends Statement {
+  constructor(public name: Token, public params: Array<Token>, public body: Array<Statement>) {
+    super();
+  }
+
+  accept<T>(visitor: Visitor<T>): T {
+    return visitor.visitFunctionStatement(this);
   }
 }

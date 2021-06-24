@@ -1,0 +1,7 @@
+fun test(a, b) {
+  print a;
+  print b;
+}
+
+test(2, 3);
+print clock();

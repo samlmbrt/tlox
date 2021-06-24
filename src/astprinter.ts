@@ -5,6 +5,7 @@ import {
   CommaExpression,
   LogicalOrExpression,
   LogicalAndExpression,
+  CallExpression,
   GroupingExpression,
   LiteralExpression,
   TernaryExpression,
@@ -17,6 +18,7 @@ import {
   Statement,
   EmptyStatement,
   ExpressionStatement,
+  FunctionStatement,
   PrintStatement,
   VariableStatement,
   Visitor as StatementVisitor,
@@ -96,6 +98,11 @@ export class AstPrinter implements ExpressionVisitor<Literal>, StatementVisitor<
     return null;
   }
 
+  public visitCallExpression(expression: CallExpression): Literal {
+    // todosam
+    throw 1;
+  }
+
   public visitBlockStatement(statement: BlockStatement): void {
     this.printWithIndent('[BlockStatement]');
     this.indentLevel++;
@@ -173,6 +180,11 @@ export class AstPrinter implements ExpressionVisitor<Literal>, StatementVisitor<
     this.indentLevel--;
 
     this.indentLevel--;
+  }
+
+  public visitFunctionStatement(statement: FunctionStatement): void {
+    // todosam
+    throw 1;
   }
 
   public visitExpressionStatement(statement: ExpressionStatement): void {

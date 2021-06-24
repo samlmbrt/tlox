@@ -2,6 +2,7 @@ import { RuntimeError } from './error';
 import {
   AssignmentExpression,
   BinaryExpression,
+  CallExpression,
   CommaExpression,
   Expression,
   GroupingExpression,
@@ -25,12 +26,21 @@ import {
   ForStatement,
   BreakStatement,
   ContinueStatement,
+  FunctionStatement,
 } from './statement';
+import { Callable } from './callable';
 import { Literal, Token, TokenType } from './token';
 import { Environment } from './environment';
+import { Function } from './function';
+import { ClockFunction } from './native';
 
 export class Interpreter implements Visitor<Literal>, Visitor<void> {
-  private static environment = new Environment();
+  public static globals = new Environment();
+  private static environment = Interpreter.globals;
+
+  constructor() {
+    Interpreter.globals.define('clock', new ClockFunction());
+  }
 
   public interpretStatements(statements: Array<Statement>): boolean {
     try {
@@ -201,6 +211,28 @@ export class Interpreter implements Visitor<Literal>, Visitor<void> {
     return value;
   }
 
+  public visitCallExpression(expression: CallExpression): Literal {
+    const callee = this.evaluate(expression.callee);
+    const args: Array<Literal> = [];
+
+    expression.args.forEach((arg: Expression) => {
+      args.push(this.evaluate(arg));
+    });
+
+    // todosam: fix check
+    // if (!(callee instanceof Callable)) {
+    //   throw this.logError(expression.paren, 'can only call functions and classes.');
+    // }
+
+    const func = callee as Callable;
+
+    if (args.length !== func.arity()) {
+      this.logError(expression.paren, `Expected ${func.arity} arguments, but got ${args.length}`);
+    }
+
+    return func.call(this, args);
+  }
+
   public visitEmptyStatement(): void {
     // noop
   }
@@ -241,6 +273,11 @@ export class Interpreter implements Visitor<Literal>, Visitor<void> {
     }
   }
 
+  public visitFunctionStatement(statement: FunctionStatement): void {
+    const func = new Function(statement);
+    Interpreter.environment.define(statement.name.lexeme, func);
+  }
+
   public visitExpressionStatement(statement: ExpressionStatement): void {
     this.evaluate(statement.expression);
   }
@@ -269,7 +306,7 @@ export class Interpreter implements Visitor<Literal>, Visitor<void> {
     Interpreter.environment.define(statement.name.lexeme, value);
   }
 
-  private executeBlock(statements: Array<Statement>, environment: Environment): void {
+  public executeBlock(statements: Array<Statement>, environment: Environment): void {
     const previousEnvironment = Interpreter.environment;
 
     try {

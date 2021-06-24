@@ -12,6 +12,7 @@ export interface Visitor<T> {
   visitAssignmentExpression(expression: AssignmentExpression): T;
   visitLogicalOrExpression(expression: LogicalOrExpression): T;
   visitLogicalAndExpression(expression: LogicalOrExpression): T;
+  visitCallExpression(expression: CallExpression): T;
 }
 
 export abstract class Expression {
@@ -125,5 +126,15 @@ export class LogicalAndExpression extends Expression {
 
   accept<T>(visitor: Visitor<T>): T {
     return visitor.visitLogicalAndExpression(this);
+  }
+}
+
+export class CallExpression extends Expression {
+  constructor(public callee: Expression, public paren: Token, public args: Array<Expression>) {
+    super();
+  }
+
+  accept<T>(visitor: Visitor<T>): T {
+    return visitor.visitCallExpression(this);
   }
 }

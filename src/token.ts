@@ -1,4 +1,6 @@
-export type Literal = string | number | boolean | null | undefined;
+import { Callable } from './callable';
+
+export type Literal = string | number | boolean | null | undefined | Callable;
 
 export enum TokenType {
   // Single-character tokens

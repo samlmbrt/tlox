@@ -11,6 +11,7 @@ import {
   VariableExpression,
   LogicalOrExpression,
   LogicalAndExpression,
+  CallExpression,
 } from './expression';
 import {
   Statement,
@@ -24,6 +25,7 @@ import {
   BreakStatement,
   ContinueStatement,
   ForStatement,
+  FunctionStatement,
 } from './statement';
 import { ParseError } from './error';
 import { Token, TokenType } from './token';
@@ -50,15 +52,39 @@ export class Parser {
 
   private declaration(): Statement {
     try {
+      if (this.match(TokenType.FUN)) return this.function('function');
       if (this.match(TokenType.VAR)) return this.variableDeclaration();
       return this.statement();
     } catch (error) {
-      console.error(error.message);
-      this.hasError = true;
+      console.error(this.logError(this.peek(), error.message).message);
       this.synchronize();
     }
 
     return new EmptyStatement();
+  }
+
+  private function(kind: string): FunctionStatement {
+    const name = this.consume(TokenType.IDENTIFIER, `Expect ${kind} name.`);
+    this.consume(TokenType.LEFT_PAREN, `Expect '(' after ${kind} name.`);
+    const parameters: Array<Token> = [];
+
+    if (!this.check(TokenType.RIGHT_PAREN)) {
+      do {
+        if (parameters.length >= 255) {
+          console.error(
+            this.logError(this.peek(), 'cannot have more than 255 parameters.').message
+          );
+        }
+
+        parameters.push(this.consume(TokenType.IDENTIFIER, 'Expect parameter name.'));
+      } while (this.match(TokenType.COMMA));
+    }
+
+    this.consume(TokenType.RIGHT_PAREN, "Expect ')' after parameters");
+    this.consume(TokenType.LEFT_BRACE, `Expect '{' before ${kind} body.`);
+
+    const body = this.blockStatement();
+    return new FunctionStatement(name, parameters, body);
   }
 
   private variableDeclaration(): Statement {
@@ -305,7 +331,38 @@ export class Parser {
       throw this.logError(this.peek(), `unary ${unsupportedToken.lexeme} is not supported.`);
     }
 
-    return this.primary();
+    return this.call();
+  }
+
+  private call(): Expression {
+    let expression = this.primary();
+
+    while (true) {
+      if (this.match(TokenType.LEFT_PAREN)) {
+        expression = this.finishCall(expression);
+      } else {
+        break;
+      }
+    }
+
+    return expression;
+  }
+
+  private finishCall(callee: Expression): Expression {
+    const args: Array<Expression> = [];
+
+    if (!this.check(TokenType.RIGHT_PAREN)) {
+      do {
+        if (args.length >= 255) {
+          console.error(this.logError(this.peek(), 'cannot have more than 255 arguments.').message);
+        }
+
+        args.push(this.expression());
+      } while (this.match(TokenType.COMMA));
+    }
+
+    const paren = this.consume(TokenType.RIGHT_PAREN, "Expect ')' after arguments.");
+    return new CallExpression(callee, paren, args);
   }
 
   private primary(): Expression {
@@ -395,7 +452,9 @@ export class Parser {
   }
 
   private logError(token: Token, message: string): ParseError {
+    this.hasError = true;
     const location = token.type === TokenType.EOF ? 'end' : token.lexeme;
+
     return new ParseError(
       `[line: ${token.line}, column: ${token.column} at ${location}] error: ${message}`
     );
